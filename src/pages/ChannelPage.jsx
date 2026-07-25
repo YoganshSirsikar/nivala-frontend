@@ -11,7 +11,7 @@ function ChannelPage() {
   const decodedName = decodeURIComponent(channelName);
 
   useEffect(() => {
-    fetch(`http://localhost:5000/api/channels/${encodeURIComponent(decodedName)}`)
+    fetch(`https://nivala-backend.onrender.com/api/channels/${encodeURIComponent(decodedName)}`)
       .then((res) => res.json())
       .then((data) => {
         setChannelDishes(data);

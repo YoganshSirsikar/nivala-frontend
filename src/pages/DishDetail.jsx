@@ -11,7 +11,7 @@ function DishDetail() {
   const [showAdded, setShowAdded] = useState(false);
 
   useEffect(() => {
-    fetch(`http://localhost:5000/api/dishes/${id}`)
+    fetch(`https://nivala-backend.onrender.com/api/dishes/${id}`)
       .then((res) => res.json())
       .then((data) => {
         setDish(data);

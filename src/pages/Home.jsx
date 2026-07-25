@@ -13,7 +13,7 @@ function Home() {
 const [loading, setLoading] = useState(true);
 
 useEffect(() => {
-  fetch("http://localhost:5000/api/dishes")
+  fetch("https://nivala-backend.onrender.com/api/dishes")
     .then((res) => res.json())
     .then((data) => {
       setDishes(data);
