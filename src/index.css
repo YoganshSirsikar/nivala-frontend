@@ -1,0 +1,27 @@
+:root {
+  --color-bg: #FDFBF7;
+  --color-green: #2F6E4F;
+  --color-orange: #E2632B;
+  --color-yellow: #F4B942;
+  --color-text: #2B2420;
+  --color-muted: #7A7168;
+  --color-card: #FFFFFF;
+  --font-heading: 'Poppins', sans-serif;
+  --font-body: 'Inter', sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-body);
+}
+
+#root {
+  width: 100%;
+}
