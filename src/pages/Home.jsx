@@ -8,6 +8,7 @@ import { useAuth } from "../context/AuthContext";
 function Home() {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("");
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [dishes, setDishes] = useState([]);
 const [loading, setLoading] = useState(true);
@@ -37,7 +38,7 @@ const handleLogout = () => {
   };
 
   // Filter dishes by name OR channel, case-insensitive
-  const filteredDishes = dishes.filter((d) => {
+  const searchedDishes = dishes.filter((d) => {
     const term = searchTerm.toLowerCase();
     return (
       d.name.toLowerCase().includes(term) ||
@@ -45,14 +46,17 @@ const handleLogout = () => {
     );
   });
 
-  const categories = [...new Set(filteredDishes.map((d) => d.category))];
+  const categories = [...new Set(dishes.map((d) => d.category).filter(Boolean))];
+  const filteredDishes = selectedCategory
+    ? searchedDishes.filter((dish) => dish.category === selectedCategory)
+    : searchedDishes;
   const isSearching = searchTerm.trim().length > 0;
 
   return (
-    <div style={styles.app}>
-      {loading && <p style={{ color: "var(--color-muted)", padding: "20px" }}>Loading dishes...</p>}
+    <div className="home-page" style={styles.app}>
+      {loading && <p className="home-loading">Loading dishes...</p>}
       {/* Header */}
-      <header style={styles.header}>
+      <header className="home-header" style={styles.header}>
   <div style={styles.headerLeft}>
     <button style={styles.hamburger} onClick={() => setIsSidebarOpen(true)}>
       ☰
@@ -60,6 +64,7 @@ const handleLogout = () => {
     <h1 style={styles.logo}>🍲 Nivala</h1>
   </div>
   <input
+    className="home-search"
     type="text"
     placeholder="Search for dishes or channels..."
     style={styles.searchBar}
@@ -70,7 +75,7 @@ const handleLogout = () => {
   🛒
   {totalItems > 0 && <span style={styles.cartBadge}>{totalItems}</span>}
 </button>
-<div style={styles.userSection}>
+<div className="home-user-section" style={styles.userSection}>
   <span style={styles.userGreeting}>
     Hi, {user?.name} 👋
   </span>
@@ -80,18 +85,27 @@ const handleLogout = () => {
 </div>
 </header>
 
-<Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
+<Sidebar
+  isOpen={isSidebarOpen}
+  onClose={() => setIsSidebarOpen(false)}
+  categories={categories}
+  selectedCategory={selectedCategory}
+  onCategorySelect={(category) => {
+    setSelectedCategory(category);
+    setIsSidebarOpen(false);
+  }}
+/>
 
       {/* If searching, show flat results. Otherwise show categorized rows. */}
       {isSearching ? (
-        <section style={styles.section}>
+        <section className="home-section" style={styles.section}>
           <h2 style={styles.sectionTitle}>
             {filteredDishes.length} result{filteredDishes.length !== 1 ? "s" : ""} for "{searchTerm}"
           </h2>
           {filteredDishes.length === 0 ? (
             <p style={styles.noResults}>No dishes or channels match your search.</p>
           ) : (
-            <div style={styles.grid}>
+            <div className="dish-grid" style={styles.grid}>
               {filteredDishes.map((dish) => (
                 <div key={dish._id} onClick={() => handleCardClick(dish._id)}>
                   <FoodCard dish={dish} />
@@ -102,10 +116,10 @@ const handleLogout = () => {
         </section>
       ) : (
         <>
-          {categories.map((category) => (
-            <section key={category} style={styles.section}>
+          {categories.filter((category) => !selectedCategory || category === selectedCategory).map((category) => (
+            <section key={category} className="home-section" style={styles.section}>
               <h2 style={styles.sectionTitle}>{category}</h2>
-              <div style={styles.horizontalScroll}>
+              <div className="dish-row" style={styles.horizontalScroll}>
                 {filteredDishes
                   .filter((d) => d.category === category)
                   .map((dish) => (
@@ -117,15 +131,15 @@ const handleLogout = () => {
             </section>
           ))}
 
-          <section style={styles.section}>
-            <h2 style={styles.sectionTitle}>All Dishes</h2>
-            <div style={styles.grid}>
+          <section className="home-section" style={styles.section}>
+            <h2 style={styles.sectionTitle}>{selectedCategory ? `${selectedCategory} Dishes` : "All Dishes"}</h2>
+            {filteredDishes.length === 0 ? <p style={styles.noResults}>No dishes are available in this category.</p> : <div className="dish-grid" style={styles.grid}>
               {filteredDishes.map((dish) => (
                 <div key={dish._id} onClick={() => handleCardClick(dish._id)}>
                   <FoodCard dish={dish} />
                 </div>
               ))}
-            </div>
+            </div>}
           </section>
         </>
       )}

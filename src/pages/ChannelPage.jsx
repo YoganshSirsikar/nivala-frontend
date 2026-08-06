@@ -28,7 +28,7 @@ function ChannelPage() {
   };
 
   return (
-    <div style={styles.page}>
+    <div className="app-page listing-page" style={styles.page}>
       <header style={styles.header}>
         <h1 style={styles.logo} onClick={() => navigate("/")}>
           🍲 Nivala
@@ -45,7 +45,7 @@ function ChannelPage() {
           : `${channelDishes.length} dish${channelDishes.length !== 1 ? "es" : ""} available`}
       </p>
 
-      <div style={styles.grid}>
+      <div className="dish-grid" style={styles.grid}>
         {channelDishes.map((dish) => (
           <div key={dish._id} onClick={() => handleCardClick(dish._id)}>
             <FoodCard dish={dish} />

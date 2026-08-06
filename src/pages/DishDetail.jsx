@@ -30,12 +30,12 @@ function DishDetail() {
   };
 
   if (loading) {
-    return <div style={styles.page}>Loading...</div>;
+    return <div className="app-page" style={styles.page}>Loading...</div>;
   }
 
   if (!dish || dish.message === "Dish not found") {
     return (
-      <div style={styles.notFound}>
+      <div className="app-page" style={styles.notFound}>
         <p>Dish not found.</p>
         <button style={styles.backButton} onClick={() => navigate("/")}>
           ← Back to Home
@@ -45,7 +45,7 @@ function DishDetail() {
   }
 
   return (
-    <div style={styles.page}>
+    <div className="app-page detail-page" style={styles.page}>
       <header style={styles.header}>
         <h1 style={styles.logo} onClick={() => navigate("/")}>
           🍲 Nivala
@@ -55,8 +55,8 @@ function DishDetail() {
         </button>
       </header>
 
-      <div style={styles.content}>
-        <img src={dish.image} alt={dish.name} style={styles.image} />
+      <div className="detail-content" style={styles.content}>
+        <img className="detail-image" src={dish.image} alt={dish.name} style={styles.image} />
 
         <div style={styles.details}>
           <h1 style={styles.name}>{dish.name}</h1>
@@ -78,7 +78,7 @@ function DishDetail() {
             home-style cooking delivered to you.
           </p>
 
-          <div style={styles.buttonRow}>
+          <div className="detail-button-row" style={styles.buttonRow}>
             <button style={styles.addButton} onClick={handleAddToCart}>
               {showAdded ? "✓ Added!" : "Add to Cart"}
             </button>

@@ -1,10 +1,7 @@
-import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 export default function FoodCard({ dish }) {
   const navigate = useNavigate();
-  const [isHovered, setIsHovered] = useState(false);
-
   const handleChannelClick = (e) => {
     e.stopPropagation();
     navigate(`/channel/${encodeURIComponent(dish.channel)}`);
@@ -12,15 +9,8 @@ export default function FoodCard({ dish }) {
 
   return (
     <div
-    style={{
-      ...styles.card,
-      transform: isHovered ? "translateY(-4px)" : "translateY(0)",
-      boxShadow: isHovered
-        ? "0 8px 20px rgba(43, 36, 32, 0.15)"
-        : "0 2px 10px rgba(43, 36, 32, 0.08)",
-    }}
-    onMouseEnter={() => setIsHovered(true)}
-    onMouseLeave={() => setIsHovered(false)}
+    className="food-card"
+    style={styles.card}
   >
       <img src={dish.image} alt={dish.name} style={styles.image} />
       <div style={styles.info}>

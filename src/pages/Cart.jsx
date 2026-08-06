@@ -6,7 +6,7 @@ function Cart() {
   const { cartItems, updateQuantity, removeFromCart, totalPrice } = useCart();
 
   return (
-    <div style={styles.page}>
+    <div className="app-page cart-page" style={styles.page}>
       <header style={styles.header}>
         <h1 style={styles.logo} onClick={() => navigate("/")}>
           🍲 Nivala
@@ -29,7 +29,7 @@ function Cart() {
         <>
           <div style={styles.itemList}>
             {cartItems.map((item) => (
-              <div key={item._id} style={styles.cartItem}>
+              <div key={item._id} className="cart-item" style={styles.cartItem}>
                 <img src={item.image} alt={item.name} style={styles.itemImage} />
                 <div style={styles.itemInfo}>
                   <p style={styles.itemName}>{item.name}</p>

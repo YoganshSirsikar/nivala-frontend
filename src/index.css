@@ -25,3 +25,96 @@ body {
 #root {
   width: 100%;
 }
+
+button, input, textarea {
+  font: inherit;
+}
+
+.food-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 20px rgba(43, 36, 32, 0.15) !important;
+}
+
+@media (max-width: 700px) {
+  .home-page,
+  .app-page {
+    padding: 16px !important;
+  }
+
+  .home-header {
+    align-items: center !important;
+    gap: 12px !important;
+    margin-bottom: 24px !important;
+  }
+
+  .home-search {
+    order: 3;
+    width: 100% !important;
+  }
+
+  .home-user-section {
+    margin-left: auto;
+  }
+
+  .home-user-section span {
+    display: none;
+  }
+
+  .dish-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 12px !important;
+  }
+
+  .dish-grid .food-card {
+    width: 100% !important;
+  }
+
+  .dish-row {
+    gap: 12px !important;
+    margin-right: -16px;
+    padding-right: 16px;
+  }
+
+  .detail-content {
+    gap: 24px !important;
+  }
+
+  .detail-image {
+    width: 100% !important;
+    height: 240px !important;
+  }
+
+  .detail-button-row {
+    flex-direction: column;
+  }
+
+  .detail-button-row button {
+    width: 100%;
+  }
+
+  .cart-item {
+    display: grid !important;
+    grid-template-columns: 70px minmax(0, 1fr) !important;
+    gap: 12px !important;
+  }
+
+  .cart-item > .quantityControls,
+  .cart-item > button {
+    grid-column: 2;
+  }
+
+  .checkout-section {
+    max-width: none !important;
+  }
+}
+
+@media (max-width: 380px) {
+  .home-page,
+  .app-page {
+    padding: 12px !important;
+  }
+
+  .dish-grid {
+    grid-template-columns: 1fr !important;
+  }
+}

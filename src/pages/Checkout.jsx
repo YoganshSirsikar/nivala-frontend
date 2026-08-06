@@ -16,7 +16,7 @@ function Checkout() {
   // If cart is empty and order hasn't just been placed, redirect feel
   if (cartItems.length === 0 && !isPlaced) {
     return (
-      <div style={styles.page}>
+      <div className="app-page checkout-page" style={styles.page}>
         <header style={styles.header}>
           <h1 style={styles.logo} onClick={() => navigate("/")}>
             🍲 Nivala
@@ -34,7 +34,7 @@ function Checkout() {
 
   if (isPlaced) {
     return (
-      <div style={styles.page}>
+      <div className="app-page checkout-page" style={styles.page}>
         <header style={styles.header}>
           <h1 style={styles.logo} onClick={() => navigate("/")}>
             🍲 Nivala
@@ -56,7 +56,7 @@ function Checkout() {
   }
 
   return (
-    <div style={styles.page}>
+    <div className="app-page checkout-page" style={styles.page}>
       <header style={styles.header}>
         <h1 style={styles.logo} onClick={() => navigate("/")}>
           🍲 Nivala
@@ -68,7 +68,7 @@ function Checkout() {
 
       <h2 style={styles.pageTitle}>Checkout</h2>
 
-      <div style={styles.section}>
+      <div className="checkout-section" style={styles.section}>
         <p style={styles.sectionLabel}>Delivery Address</p>
         <textarea
           style={styles.addressInput}
@@ -78,7 +78,7 @@ function Checkout() {
         />
       </div>
 
-      <div style={styles.section}>
+      <div className="checkout-section" style={styles.section}>
         <p style={styles.sectionLabel}>Order Summary</p>
         {cartItems.map((item) => (
           <div key={item.id} style={styles.summaryItem}>

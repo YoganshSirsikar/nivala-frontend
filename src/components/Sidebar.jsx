@@ -1,26 +1,15 @@
 import { useNavigate } from "react-router-dom";
 
-const categories = [
-  "Healthy",
-  "Fast Food",
-  "Sandwiches",
-  "Breads & Rotis",
-  "Sweets & Desserts",
-  "South Indian",
-  "North Indian",
-  "Snacks",
-];
-
-export default function Sidebar({ isOpen, onClose }) {
+export default function Sidebar({ isOpen, onClose, categories, selectedCategory, onCategorySelect }) {
   const navigate = useNavigate();
 
   return (
     <>
       {/* Dark overlay behind sidebar - clicking it closes the menu */}
-      {isOpen && <div style={styles.overlay} onClick={onClose}></div>}
+      {isOpen && <div style={styles.overlay} onClick={onClose} aria-hidden="true" />}
 
       {/* Sidebar panel */}
-      <div
+      <aside
         style={{
           ...styles.sidebar,
           transform: isOpen ? "translateX(0)" : "translateX(-100%)",
@@ -49,13 +38,25 @@ export default function Sidebar({ isOpen, onClose }) {
         {/* Category list */}
         <div style={styles.categorySection}>
           <p style={styles.sectionLabel}>Browse by Category</p>
+          <button
+            type="button"
+            style={{ ...styles.categoryItem, ...(selectedCategory === "" ? styles.activeCategoryItem : {}) }}
+            onClick={() => onCategorySelect("")}
+          >
+            All Categories
+          </button>
           {categories.map((cat) => (
-            <div key={cat} style={styles.categoryItem}>
+            <button
+              type="button"
+              key={cat}
+              style={{ ...styles.categoryItem, ...(selectedCategory === cat ? styles.activeCategoryItem : {}) }}
+              onClick={() => onCategorySelect(cat)}
+            >
               {cat}
-            </div>
+            </button>
           ))}
         </div>
-      </div>
+      </aside>
     </>
   );
 }
@@ -146,10 +147,21 @@ const styles = {
     fontWeight: 600,
   },
   categoryItem: {
+    appearance: "none",
+    width: "100%",
+    backgroundColor: "transparent",
+    border: "none",
+    textAlign: "left",
     padding: "12px 10px",
     fontSize: "15px",
     color: "var(--color-text)",
     borderBottom: "1px solid rgba(43, 36, 32, 0.06)",
     cursor: "pointer",
+  },
+  activeCategoryItem: {
+    color: "var(--color-green)",
+    backgroundColor: "rgba(47, 110, 79, 0.08)",
+    borderRadius: "8px",
+    fontWeight: 700,
   },
 };
