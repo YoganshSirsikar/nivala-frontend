@@ -1,10 +1,7 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useCart } from "../context/CartContext";
-
-const fallbackFoodImage = "https://images.unsplash.com/photo-1601050690597-df0568f70950?auto=format&fit=crop&w=800&q=80";
-const gulabJamunImage = "https://commons.wikimedia.org/wiki/Special:FilePath/Gulabjamun.jpg?width=960";
-const getDishImage = (dish) => dish.name.toLowerCase().includes("gulab jamun") ? gulabJamunImage : dish.image;
+import { fallbackFoodImage, getDishImage, getDishMeta } from "../utils/dishMeta";
 
 function DishDetail() {
   const { id } = useParams();
@@ -48,6 +45,8 @@ function DishDetail() {
     );
   }
 
+  const meta = getDishMeta(dish);
+
   return (
     <div className="app-page detail-page" style={styles.page}>
       <header style={styles.header}>
@@ -59,54 +58,33 @@ function DishDetail() {
         </button>
       </header>
 
-      <div className="detail-content" style={styles.content}>
-        <img
-          className="detail-image"
-          src={getDishImage(dish)}
-          alt={dish.name}
-          style={styles.image}
-          onError={(event) => {
-            event.currentTarget.onerror = null;
-            event.currentTarget.src = fallbackFoodImage;
-          }}
-        />
-
-        <div style={styles.details}>
-          <h1 style={styles.name}>{dish.name}</h1>
-          <p
-            style={styles.channel}
-            onClick={() => navigate(`/channel/${encodeURIComponent(dish.channel)}`)}
-          >
-            by {dish.channel}
-          </p>
-
-          <div style={styles.metaRow}>
-            <span style={styles.price}>₹{dish.price}</span>
-            <span style={styles.rating}>⭐ {dish.rating}</span>
-          </div>
-
-          <p style={styles.description}>
-            Freshly prepared homemade {dish.name}, made with love and quality
-            ingredients by {dish.channel}. Order now and enjoy authentic,
-            home-style cooking delivered to you.
-          </p>
-
-          <div className="detail-button-row" style={styles.buttonRow}>
-            <button style={styles.addButton} onClick={handleAddToCart}>
-              {showAdded ? "✓ Added!" : "Add to Cart"}
-            </button>
-            <button
-              style={styles.orderButton}
-              onClick={() => {
-                addToCart(dish);
-                navigate("/cart");
-              }}
-            >
-              Order Now
-            </button>
-          </div>
+      <section className="dish-detail-layout">
+        <div className="dish-image-panel">
+          <img className="detail-image" src={getDishImage(dish)} alt={dish.name} onError={(event) => { event.currentTarget.onerror = null; event.currentTarget.src = fallbackFoodImage; }} />
+          <span className="detail-diet-badge">{meta.isVegetarian ? "● 100% Vegetarian" : "● Non-vegetarian"}</span>
+          <span className="detail-availability">{meta.isAvailable ? "● Available today" : "Currently unavailable"}</span>
         </div>
-      </div>
+
+        <div className="dish-main-info">
+          <p className="eyebrow">{dish.category || "HOME-COOKED FAVOURITE"}</p>
+          <h1>{dish.name}</h1>
+          <button className="chef-link" onClick={() => navigate(`/channel/${encodeURIComponent(dish.channel)}`)}>👩‍🍳 From {dish.channel} <span>→</span></button>
+          <div className="dish-price-row"><strong>₹{dish.price}</strong><span>★ {dish.rating} <small>({meta.reviewCount} ratings)</small></span></div>
+          <div className="dish-facts"><div><span>⏱</span><p><strong>{meta.prepTime}</strong><br />Preparation</p></div><div><span>🍽</span><p><strong>{meta.serves}</strong><br />Portion size</p></div><div><span>🏡</span><p><strong>Home made</strong><br />Made to order</p></div></div>
+          <p className="dish-description">{meta.story}</p>
+          <div className="dish-actions">
+            <button className="add-to-cart" disabled={!meta.isAvailable} onClick={handleAddToCart}>{showAdded ? "✓ Added to cart" : "Add to cart"}</button>
+            <button className="order-now" disabled={!meta.isAvailable} onClick={() => { addToCart(dish); navigate("/cart"); }}>Order now <span>→</span></button>
+          </div>
+          <p className="delivery-note">🕒 Freshly prepared after you order · Delivery/pickup details at checkout</p>
+        </div>
+      </section>
+
+      <section className="dish-information-grid">
+        <article><h2>What’s inside</h2><p>Prepared with simple, familiar ingredients by this home kitchen.</p><div className="ingredient-list">{meta.ingredients.map((ingredient) => <span key={ingredient}>✓ {ingredient}</span>)}</div></article>
+        <article><h2>Allergy note</h2><p>{meta.allergens.join(" ")}</p><p className="allergen-help">For dietary requirements, confirm directly with the kitchen before placing an order.</p></article>
+        <article><h2>Why Nivala?</h2><p>Support a local home chef and enjoy food made with personal care, not mass-produced in a restaurant kitchen.</p></article>
+      </section>
     </div>
   );
 }

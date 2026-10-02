@@ -4,14 +4,12 @@ import FoodCard from "../components/FoodCard";
 import Sidebar from "../components/Sidebar";
 import { useCart } from "../context/CartContext";
 import { useAuth } from "../context/AuthContext";
+import { fallbackFoodImage, getDishImage } from "../utils/dishMeta";
 
 const categoryIcons = {
   "Sweets & Snacks": "🍬", "Popular Today": "🔥", "Try Something New": "✨",
   Healthy: "🥗", "North Indian": "🍛", "South Indian": "🥘", Snacks: "🥟",
 };
-const fallbackFoodImage = "https://images.unsplash.com/photo-1601050690597-df0568f70950?auto=format&fit=crop&w=800&q=80";
-const gulabJamunImage = "https://commons.wikimedia.org/wiki/Special:FilePath/Gulabjamun.jpg?width=960";
-const getDishImage = (dish) => dish.name.toLowerCase().includes("gulab jamun") ? gulabJamunImage : dish.image;
 
 function Home() {
   const navigate = useNavigate();
