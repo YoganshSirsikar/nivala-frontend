@@ -2,6 +2,8 @@ import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useCart } from "../context/CartContext";
 
+const fallbackFoodImage = "https://images.unsplash.com/photo-1601050690597-df0568f70950?auto=format&fit=crop&w=800&q=80";
+
 function DishDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -56,7 +58,16 @@ function DishDetail() {
       </header>
 
       <div className="detail-content" style={styles.content}>
-        <img className="detail-image" src={dish.image} alt={dish.name} style={styles.image} />
+        <img
+          className="detail-image"
+          src={dish.image}
+          alt={dish.name}
+          style={styles.image}
+          onError={(event) => {
+            event.currentTarget.onerror = null;
+            event.currentTarget.src = fallbackFoodImage;
+          }}
+        />
 
         <div style={styles.details}>
           <h1 style={styles.name}>{dish.name}</h1>
