@@ -1,6 +1,10 @@
 import { useNavigate } from "react-router-dom";
 
 const fallbackFoodImage = "https://images.unsplash.com/photo-1601050690597-df0568f70950?auto=format&fit=crop&w=800&q=80";
+const gulabJamunImage = "https://commons.wikimedia.org/wiki/Special:FilePath/Gulabjamun.jpg?width=960";
+
+const getDishImage = (dish) =>
+  dish.name.toLowerCase().includes("gulab jamun") ? gulabJamunImage : dish.image;
 
 export default function FoodCard({ dish }) {
   const navigate = useNavigate();
@@ -15,7 +19,7 @@ export default function FoodCard({ dish }) {
     style={styles.card}
   >
       <img
-        src={dish.image}
+        src={getDishImage(dish)}
         alt={dish.name}
         style={styles.image}
         onError={(event) => {

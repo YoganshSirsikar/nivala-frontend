@@ -10,6 +10,8 @@ const categoryIcons = {
   Healthy: "🥗", "North Indian": "🍛", "South Indian": "🥘", Snacks: "🥟",
 };
 const fallbackFoodImage = "https://images.unsplash.com/photo-1601050690597-df0568f70950?auto=format&fit=crop&w=800&q=80";
+const gulabJamunImage = "https://commons.wikimedia.org/wiki/Special:FilePath/Gulabjamun.jpg?width=960";
+const getDishImage = (dish) => dish.name.toLowerCase().includes("gulab jamun") ? gulabJamunImage : dish.image;
 
 function Home() {
   const navigate = useNavigate();
@@ -72,7 +74,7 @@ function Home() {
             <div className="hero-trust"><span className="trust-avatars">🍲 🧑‍🍳 👩‍🍳</span><p><strong>Made with care</strong><br />by local home chefs</p></div>
           </div>
           <div className="hero-visual" aria-label="A selection of home-cooked meals">
-            {featuredDishes.slice(0, 3).map((dish, index) => <img key={dish._id} className={`hero-food hero-food-${index + 1}`} src={dish.image} alt={dish.name} onError={(event) => { event.currentTarget.onerror = null; event.currentTarget.src = fallbackFoodImage; }} />)}
+            {featuredDishes.slice(0, 3).map((dish, index) => <img key={dish._id} className={`hero-food hero-food-${index + 1}`} src={getDishImage(dish)} alt={dish.name} onError={(event) => { event.currentTarget.onerror = null; event.currentTarget.src = fallbackFoodImage; }} />)}
             <div className="hero-rating">★ 4.8 <span>community favourite</span></div><div className="hero-badge">✦ Freshly made<br /><strong>near you</strong></div>
           </div>
         </section>
