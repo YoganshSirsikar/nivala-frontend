@@ -21,4 +21,8 @@ export const api = {
   updateDish: (id, patch) => req(`/api/dishes/${id}`, { method: "PATCH", body: JSON.stringify(patch) }),
   listChannelDishes: (channel) => req(`/api/channels/${encodeURIComponent(channel)}`),
   saveKitchen: (kitchen) => req("/api/kitchens", { method: "POST", body: JSON.stringify(kitchen) }),
+  createRequest: (r) => req("/api/requests", { method: "POST", body: JSON.stringify(r) }),
+  listRequests: () => req("/api/requests"),
+  acceptRequest: (id, kitchen) => req(`/api/requests/${id}/accept`, { method: "PATCH", body: JSON.stringify({ kitchen }) }),
+  demand: () => req("/api/demand"),
 };

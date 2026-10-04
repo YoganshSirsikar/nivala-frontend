@@ -88,6 +88,11 @@ function Home() {
           <div><span>💛</span><p><strong>Support home chefs</strong><br />Every order empowers a local cook</p></div>
         </section>
 
+        <section className="home-section">
+          <div className="section-heading"><div><p className="eyebrow">CAN'T FIND IT? ASK FOR IT</p><h2>Request a dish, cooks respond</h2></div><button onClick={() => navigate("/requests")}>Make a request →</button></div>
+          <p className="status-message" style={{ padding: "0 0 12px" }}>Customer → Request → Home Cook → Order · Sellers see a live Demand Map of what your area craves.</p>
+        </section>
+
         <section id="featured-kitchens" className="home-section">
           <div className="section-heading"><div><p className="eyebrow">LOVED BY THE COMMUNITY</p><h2>Popular right now</h2></div><button onClick={() => chooseCategory("")}>See all meals →</button></div>
           <div className="dish-row">{featuredDishes.map((dish) => <div key={dish._id} onClick={() => navigate(`/dish/${dish._id}`)}><FoodCard dish={dish} /></div>)}</div>
