@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useCart } from "../context/CartContext";
 import { useAuth } from "../context/AuthContext";
 import { saveOrder, estimateDeliveryMinutes } from "../utils/orders";
+import { api } from "../utils/api";
 
 function Checkout() {
   const navigate = useNavigate();
@@ -19,10 +20,11 @@ function Checkout() {
   const grandTotal = totalPrice + deliveryFee + serviceFee;
   const eta = estimateDeliveryMinutes(itemCount, mode);
 
-  const handlePlaceOrder = () => {
+  const handlePlaceOrder = async () => {
     if (mode === "delivery" && !address.trim()) return;
-    const order = saveOrder({
-      items: cartItems.map((i) => ({ name: i.name, qty: i.quantity, price: i.price, channel: i.channel })),
+    const payload = {
+      buyer: user?.name || "Guest",
+      items: cartItems.map((i) => ({ dishId: i._id, name: i.name, qty: i.quantity, price: i.price, channel: i.channel })),
       subtotal: totalPrice,
       deliveryFee,
       serviceFee,
@@ -30,9 +32,18 @@ function Checkout() {
       mode,
       payment: `${payment} (demo)`,
       address: mode === "pickup" ? "Pickup from kitchen" : address,
-      buyer: user?.name || "Guest",
+      kitchen: cartItems[0]?.channel || "",
       etaMinutes: eta,
-    });
+      status: "Placed",
+    };
+    let order;
+    try {
+      const remote = await api.createOrder(payload);
+      order = saveOrder({ ...payload, id: remote._id.slice(-6), _id: remote._id });
+      order = { ...remote, id: `NV-${remote._id.slice(-6)}` };
+    } catch {
+      order = saveOrder(payload);
+    }
     clearCart();
     setPlaced(order);
   };

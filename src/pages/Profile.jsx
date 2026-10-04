@@ -1,16 +1,97 @@
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { getOrders } from "../utils/orders";
+import { api } from "../utils/api";
+
+const STATUS_FLOW = ["Placed", "Accepted", "Preparing", "Ready", "Completed"];
 
 function Profile() {
   const navigate = useNavigate();
   const { user, logout } = useAuth();
-  const orders = getOrders();
+  const [localOrders] = useState(() => getOrders());
+  const [remoteOrders, setRemoteOrders] = useState([]);
+  const [myDishes, setMyDishes] = useState([]);
+  const [kitchenMsg, setKitchenMsg] = useState("");
+  const [dishMsg, setDishMsg] = useState("");
+
+  const isSeller = user?.role === "seller";
+  const kitchenName = isSeller ? user?.name : "";
   const followed = Object.keys(localStorage)
     .filter((k) => k.startsWith("nivala-following-") && localStorage.getItem(k) === "true")
     .map((k) => k.replace("nivala-following-", ""));
 
-  const myReviewsCount = Object.keys(localStorage).filter((k) => k.startsWith("nivala-reviews")).length;
+  const [kitchenForm, setKitchenForm] = useState({ location: "Local home kitchen", story: "", hygieneNote: "" });
+  const [dishForm, setDishForm] = useState({
+    name: "", price: "", category: "Popular Today", image: "", isVegetarian: true,
+    prepTime: "25–35 min", serves: "Serves 1", ingredients: "", isAvailable: true,
+  });
+
+  useEffect(() => {
+    if (!isSeller || !kitchenName) return;
+    api.listChannelDishes(kitchenName).then(setMyDishes).catch(() => {});
+    api.listOrders({ kitchen: kitchenName }).then(setRemoteOrders).catch(() => {});
+  }, [isSeller, kitchenName]);
+
+  const handleSaveKitchen = async (e) => {
+    e.preventDefault();
+    try {
+      await api.saveKitchen({ name: kitchenName, chef: kitchenName, ...kitchenForm, verified: false });
+      setKitchenMsg("Kitchen profile saved (pending verification demo).");
+    } catch {
+      setKitchenMsg("Backend offline — saved locally for demo.");
+      localStorage.setItem(`nivala-kitchen-${kitchenName}`, JSON.stringify(kitchenForm));
+    }
+  };
+
+  const handleAddDish = async (e) => {
+    e.preventDefault();
+    if (!dishForm.name.trim() || !dishForm.price) return;
+    const payload = {
+      name: dishForm.name.trim(),
+      channel: kitchenName,
+      price: Number(dishForm.price),
+      category: dishForm.category,
+      image: dishForm.image || "https://images.unsplash.com/photo-1585937421612-70a008356fbe?w=400",
+      rating: 4.5,
+      isVegetarian: dishForm.isVegetarian,
+      prepTime: dishForm.prepTime,
+      serves: dishForm.serves,
+      ingredients: dishForm.ingredients.split(",").map((s) => s.trim()).filter(Boolean),
+      isAvailable: dishForm.isAvailable,
+    };
+    try {
+      const created = await api.createDish(payload);
+      setMyDishes((p) => [created, ...p]);
+      setDishMsg(`Added “${created.name}” — live for buyers now.`);
+      setDishForm({ ...dishForm, name: "", price: "", image: "", ingredients: "" });
+    } catch {
+      setDishMsg("Backend offline — dish kept in demo mode only.");
+    }
+  };
+
+  const toggleAvailability = async (dish) => {
+    try {
+      const updated = await api.updateDish(dish._id, { isAvailable: !dish.isAvailable });
+      setMyDishes((p) => p.map((d) => (d._id === dish._id ? updated : d)));
+    } catch {
+      setDishMsg("Could not update — backend offline.");
+    }
+  };
+
+  const advanceStatus = async (order, next) => {
+    try {
+      const updated = await api.updateOrderStatus(order._id, next);
+      setRemoteOrders((p) => p.map((o) => (o._id === updated._id ? updated : o)));
+    } catch {
+      alert("Backend offline — status change is demo-only.");
+    }
+  };
+
+  const earnings = remoteOrders
+    .filter((o) => o.status === "Completed")
+    .reduce((s, o) => s + (o.total || 0), 0);
+  const commission = Math.round(earnings * 0.1);
 
   return (
     <main className="app-page" style={styles.page}>
@@ -19,43 +100,76 @@ function Profile() {
         <button style={styles.backButton} onClick={() => navigate("/")}>← Back</button>
       </header>
 
-      <p className="eyebrow">{user?.role === "seller" ? "SELLER PROFILE (DEMO)" : "BUYER PROFILE"}{user?.guest ? " · GUEST" : ""}</p>
+      <p className="eyebrow">{isSeller ? "SELLER DASHBOARD (DEMO-LIVE)" : "BUYER PROFILE"}{user?.guest ? " · GUEST" : ""}</p>
       <h1 style={styles.title}>Hi, {user?.name || "there"} 👋</h1>
-      <p style={styles.sub}>{user?.role === "seller"
-        ? "Same homepage as buyers for now. Seller tools live here — add dishes, track orders, earnings (demo, backend next)."
+      <p style={styles.sub}>{isSeller
+        ? "Same homepage as buyers. Manage your kitchen, dishes and orders here. Buyers see wait times because food is homemade."
         : "Your orders, reviews and followed kitchens live here."}</p>
 
-      {user?.role === "seller" ? (
+      {isSeller ? (
         <>
           <section style={styles.section}>
-            <h2>Seller quick actions</h2>
-            <div style={styles.row}>
-              <button style={styles.primary} onClick={() => navigate("/?seller-add=1")}>+ Add dish (next: seller dashboard)</button>
-              <button style={styles.secondary} onClick={() => navigate("/")}>View buyer homepage</button>
-            </div>
-            <ul style={styles.list}>
-              <li>✓ Upload dish photo, price, category, prep time, availability — coming in Seller Dashboard</li>
-              <li>✓ Incoming orders will appear here with Accept → Preparing → Ready states</li>
-              <li>✓ Earnings = sum of your kitchen orders minus commission (demo)</li>
-            </ul>
+            <h2>1 · My kitchen ({kitchenName})</h2>
+            <form onSubmit={handleSaveKitchen} style={styles.form}>
+              <input style={styles.input} placeholder="Location" value={kitchenForm.location} onChange={(e) => setKitchenForm({ ...kitchenForm, location: e.target.value })} />
+              <textarea style={styles.input} placeholder="Kitchen story — who cooks, tradition..." value={kitchenForm.story} onChange={(e) => setKitchenForm({ ...kitchenForm, story: e.target.value })} />
+              <label style={styles.check}><input type="checkbox" checked={kitchenForm.hygieneNote === "declared"} onChange={(e) => setKitchenForm({ ...kitchenForm, hygieneNote: e.target.checked ? "declared" : "" })} /> I declare hygienic home preparation (demo verification)</label>
+              <button style={styles.primary} type="submit">Save kitchen</button>
+              {kitchenMsg && <small>{kitchenMsg}</small>}
+            </form>
           </section>
+
           <section style={styles.section}>
-            <h2>Incoming orders (demo — all local orders)</h2>
-            {orders.length === 0 ? <p>No orders yet. Place a test order as buyer to see seller view.</p> :
-              orders.map((o) => (
-                <div key={o.id} style={styles.orderCard}>
-                  <strong>{o.id}</strong> · {o.items.length} items · ₹{o.total} · {o.status} · {o.mode}
-                  <br /><small>{o.buyer} · ETA ~{o.etaMinutes} min · Homemade buffer included</small>
-                </div>
-              ))}
+            <h2>2 · Add dish — goes live instantly</h2>
+            <form onSubmit={handleAddDish} style={styles.form}>
+              <div style={styles.grid}>
+                <input style={styles.input} placeholder="Dish name *" value={dishForm.name} onChange={(e) => setDishForm({ ...dishForm, name: e.target.value })} />
+                <input style={styles.input} type="number" placeholder="Price ₹ *" value={dishForm.price} onChange={(e) => setDishForm({ ...dishForm, price: e.target.value })} />
+                <input style={styles.input} placeholder="Photo URL (or blank)" value={dishForm.image} onChange={(e) => setDishForm({ ...dishForm, image: e.target.value })} />
+                <input style={styles.input} placeholder="Category" value={dishForm.category} onChange={(e) => setDishForm({ ...dishForm, category: e.target.value })} />
+                <input style={styles.input} placeholder="Prep time" value={dishForm.prepTime} onChange={(e) => setDishForm({ ...dishForm, prepTime: e.target.value })} />
+                <input style={styles.input} placeholder="Serves" value={dishForm.serves} onChange={(e) => setDishForm({ ...dishForm, serves: e.target.value })} />
+              </div>
+              <input style={styles.input} placeholder="Ingredients, comma separated" value={dishForm.ingredients} onChange={(e) => setDishForm({ ...dishForm, ingredients: e.target.value })} />
+              <label style={styles.check}><input type="checkbox" checked={dishForm.isVegetarian} onChange={(e) => setDishForm({ ...dishForm, isVegetarian: e.target.checked })} /> Vegetarian</label>
+              <button style={styles.primary} type="submit">+ Add dish</button>
+              {dishMsg && <small>{dishMsg}</small>}
+            </form>
+            <h3 style={{ marginTop: 16 }}>My dishes ({myDishes.length})</h3>
+            {myDishes.map((d) => (
+              <div key={d._id} style={styles.orderCard}>
+                <strong>{d.name}</strong> · ₹{d.price} · {d.isAvailable ? "Available" : "Sold out"}{" "}
+                <button style={styles.link} onClick={() => toggleAvailability(d)}>toggle availability</button>
+              </div>
+            ))}
+          </section>
+
+          <section style={styles.section}>
+            <h2>3 · Incoming orders ({remoteOrders.length} real + {localOrders.length} local demo)</h2>
+            {remoteOrders.length === 0 && <p>No real backend orders yet — place a test order as buyer.</p>}
+            {remoteOrders.map((o) => (
+              <div key={o._id} style={styles.orderCard}>
+                <strong>{o._id.slice(-6)}</strong> · {o.buyer} · ₹{o.total} · <b>{o.status}</b> · {o.mode} · ETA ~{o.etaMinutes} min
+                <br /><small>{o.items.map((i) => `${i.name} x${i.qty}`).join(", ")}</small>
+                <br />
+                {STATUS_FLOW.filter((s) => s !== "Placed").map((s) => (
+                  <button key={s} style={styles.mini} disabled={o.status === s} onClick={() => advanceStatus(o, s)}>{s}</button>
+                ))}
+              </div>
+            ))}
+          </section>
+
+          <section style={styles.section}>
+            <h2>4 · Earnings (demo)</h2>
+            <p>Completed sales: ₹{earnings} · Commission 10%: ₹{commission} · You keep: ₹{earnings - commission}</p>
           </section>
         </>
       ) : (
         <>
           <section style={styles.section}>
-            <h2>Order history ({orders.length})</h2>
-            {orders.length === 0 ? <p>No orders yet. <button style={styles.link} onClick={() => navigate("/")}>Browse meals →</button></p> :
-              orders.map((o) => (
+            <h2>Order history ({localOrders.length} local)</h2>
+            {localOrders.length === 0 ? <p>No orders yet. <button style={styles.link} onClick={() => navigate("/")}>Browse meals →</button></p> :
+              localOrders.map((o) => (
                 <div key={o.id} style={styles.orderCard}>
                   <strong>{o.id}</strong> · ₹{o.total} · {o.mode} · ~{o.etaMinutes} min · {o.status}
                   <br /><small>{o.items.map((i) => `${i.name} x${i.qty}`).join(", ")}</small>
@@ -64,14 +178,10 @@ function Profile() {
           </section>
           <section style={styles.section}>
             <h2>Followed kitchens ({followed.length})</h2>
-            {followed.length === 0 ? <p>You don’t follow any kitchen yet. Open a kitchen → Follow.</p> :
+            {followed.length === 0 ? <p>You don’t follow any kitchen yet.</p> :
               followed.map((k) => (
                 <button key={k} style={styles.link} onClick={() => navigate(`/channel/${encodeURIComponent(k)}`)}>• {k}<br /></button>
               ))}
-          </section>
-          <section style={styles.section}>
-            <h2>Reviews you gave</h2>
-            <p>Reviews save in this browser for demo. Open any dish → post a review → it appears there with ✓ Verified order.</p>
           </section>
         </>
       )}
@@ -87,14 +197,16 @@ const styles = {
   logo: { color: "var(--color-green)", margin: 0, fontFamily: "var(--font-heading)", fontSize: "22px", cursor: "pointer" },
   backButton: { background: "var(--color-card)", border: "1px solid rgba(43,36,32,0.15)", padding: "8px 16px", borderRadius: "20px", cursor: "pointer" },
   title: { fontFamily: "var(--font-heading)", margin: "4px 0" },
-  sub: { color: "var(--color-muted)", maxWidth: "600px" },
-  section: { background: "var(--color-card)", borderRadius: "16px", padding: "20px", margin: "16px 0", maxWidth: "640px" },
-  row: { display: "flex", gap: "10px", flexWrap: "wrap", marginBottom: "10px" },
+  sub: { color: "var(--color-muted)", maxWidth: "640px" },
+  section: { background: "var(--color-card)", borderRadius: "16px", padding: "20px", margin: "16px 0", maxWidth: "700px" },
+  form: { display: "flex", flexDirection: "column", gap: "10px", marginTop: "10px" },
+  grid: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px" },
+  input: { padding: "12px", borderRadius: "10px", border: "1px solid rgba(43,36,32,0.2)" },
+  check: { fontSize: "14px", display: "flex", gap: "8px", alignItems: "center" },
   primary: { background: "var(--color-green)", color: "#fff", border: "none", padding: "12px 18px", borderRadius: "10px", cursor: "pointer", fontWeight: 600 },
-  secondary: { background: "transparent", border: "1px solid rgba(43,36,32,0.2)", padding: "12px 18px", borderRadius: "10px", cursor: "pointer" },
-  list: { fontSize: "14px", lineHeight: "1.7", color: "var(--color-text)" },
   orderCard: { borderBottom: "1px solid rgba(43,36,32,0.08)", padding: "10px 0", fontSize: "14px" },
-  link: { background: "none", border: "none", color: "var(--color-green)", cursor: "pointer", fontSize: "14px", textAlign: "left" },
+  link: { background: "none", border: "none", color: "var(--color-green)", cursor: "pointer", fontSize: "13px", textDecoration: "underline" },
+  mini: { margin: "4px 4px 0 0", padding: "6px 10px", borderRadius: "8px", border: "1px solid rgba(43,36,32,0.2)", cursor: "pointer", fontSize: "12px" },
   logout: { marginTop: "12px", background: "none", border: "1px solid rgba(43,36,32,0.2)", padding: "10px 20px", borderRadius: "10px", cursor: "pointer" },
 };
 
