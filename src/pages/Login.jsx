@@ -45,7 +45,7 @@ function Login() {
             <button type="button" style={styles.skipButton} onClick={handleSkip}>
               Skip for now → browse as guest buyer
             </button>
-            <p style={styles.demoNote}>Demo login — no real password needed for judges</p>
+            <p style={styles.demoNote}>Quick login — no real password needed</p>
           </div>
         ) : (
           <form style={styles.form} onSubmit={handleLogin}>

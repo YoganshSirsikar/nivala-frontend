@@ -104,7 +104,7 @@ function Checkout() {
       </div>
 
       <div style={styles.section}>
-        <p style={styles.sectionLabel}>2 · Payment (demo for BuzzTech)</p>
+        <p style={styles.sectionLabel}>2 · Payment</p>
         <div style={styles.row}>
           {["upi", "card", "cod"].map((p) => (
             <button key={p} style={payment === p ? styles.activeChip : styles.chip} onClick={() => setPayment(p)}>{p.toUpperCase()}</button>
