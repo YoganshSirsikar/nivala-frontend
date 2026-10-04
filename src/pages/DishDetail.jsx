@@ -1,15 +1,21 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useCart } from "../context/CartContext";
+import { useAuth } from "../context/AuthContext";
 import { fallbackFoodImage, getDishImage, getDishMeta } from "../utils/dishMeta";
+import { getReviews, addReview, getReviewSummary } from "../utils/reviews";
 
 function DishDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { addToCart } = useCart();
+  const { user } = useAuth();
   const [dish, setDish] = useState(null);
   const [loading, setLoading] = useState(true);
   const [showAdded, setShowAdded] = useState(false);
+  const [reviews, setReviews] = useState([]);
+  const [ratingInput, setRatingInput] = useState(5);
+  const [commentInput, setCommentInput] = useState("");
 
   useEffect(() => {
     fetch(`https://nivala-backend.onrender.com/api/dishes/${id}`)
@@ -17,12 +23,25 @@ function DishDetail() {
       .then((data) => {
         setDish(data);
         setLoading(false);
+        setReviews(getReviews(data._id || id));
       })
       .catch((err) => {
         console.error("Failed to fetch dish:", err);
         setLoading(false);
       });
   }, [id]);
+
+  const handleAddReview = (e) => {
+    e.preventDefault();
+    if (!commentInput.trim()) return;
+    const r = addReview(dish._id, {
+      name: user?.name || "Guest",
+      rating: ratingInput,
+      comment: commentInput.trim(),
+    });
+    setReviews((prev) => [r, ...prev]);
+    setCommentInput("");
+  };
 
   const handleAddToCart = () => {
     addToCart(dish);
@@ -46,6 +65,7 @@ function DishDetail() {
   }
 
   const meta = getDishMeta(dish);
+  const summary = getReviewSummary({ ...dish, reviewCount: meta.reviewCount });
 
   return (
     <div className="app-page detail-page" style={styles.page}>
@@ -69,7 +89,7 @@ function DishDetail() {
           <p className="eyebrow">{dish.category || "HOME-COOKED FAVOURITE"}</p>
           <h1>{dish.name}</h1>
           <button className="chef-link" onClick={() => navigate(`/channel/${encodeURIComponent(dish.channel)}`)}>👩‍🍳 From {dish.channel} <span>→</span></button>
-          <div className="dish-price-row"><strong>₹{dish.price}</strong><span>★ {dish.rating} <small>({meta.reviewCount} ratings)</small></span></div>
+          <div className="dish-price-row"><strong>₹{dish.price}</strong><span>★ {summary.avg} <small>({summary.count} ratings)</small></span></div>
           <div className="dish-facts"><div><span>⏱</span><p><strong>{meta.prepTime}</strong><br />Preparation</p></div><div><span>🍽</span><p><strong>{meta.serves}</strong><br />Portion size</p></div><div><span>🏡</span><p><strong>Home made</strong><br />Made to order</p></div></div>
           <p className="dish-description">{meta.story}</p>
           <div className="dish-actions">
@@ -84,6 +104,35 @@ function DishDetail() {
         <article><h2>What’s inside</h2><p>Prepared with simple, familiar ingredients by this home kitchen.</p><div className="ingredient-list">{meta.ingredients.map((ingredient) => <span key={ingredient}>✓ {ingredient}</span>)}</div></article>
         <article><h2>Allergy note</h2><p>{meta.allergens.join(" ")}</p><p className="allergen-help">For dietary requirements, confirm directly with the kitchen before placing an order.</p></article>
         <article><h2>Why Nivala?</h2><p>Support a local home chef and enjoy food made with personal care, not mass-produced in a restaurant kitchen.</p></article>
+      </section>
+
+      <section className="dish-reviews">
+        <h2>★ {summary.avg} · {summary.count} ratings & reviews</h2>
+        <form className="review-form" onSubmit={handleAddReview}>
+          <div className="review-form-row">
+            <label>Your rating
+              <select value={ratingInput} onChange={(e) => setRatingInput(Number(e.target.value))}>
+                <option value={5}>★★★★★ (5)</option>
+                <option value={4}>★★★★ (4)</option>
+                <option value={3}>★★★ (3)</option>
+                <option value={2}>★★ (2)</option>
+                <option value={1}>★ (1)</option>
+              </select>
+            </label>
+          </div>
+          <textarea placeholder="Share how it tasted, portion, packing..." value={commentInput} onChange={(e) => setCommentInput(e.target.value)} rows={3} />
+          <button type="submit">Post review as {user?.name || "Guest"}</button>
+          <small>Demo reviews save in this browser · Marked as ✓ Verified order</small>
+        </form>
+        <div className="review-list">
+          {reviews.length === 0 ? <p className="status-message">No written reviews yet — be the first to review this home dish.</p> :
+            reviews.map((r) => (
+              <div key={r.id} className="review-card">
+                <p><strong>{r.name}</strong> · {"★".repeat(r.rating)} <span className="verified-order">✓ Verified order</span></p>
+                <p>{r.comment}</p>
+              </div>
+            ))}
+        </div>
       </section>
     </div>
   );

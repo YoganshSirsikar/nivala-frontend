@@ -16,6 +16,11 @@ function Login() {
     navigate("/");
   };
 
+  const handleSkip = () => {
+    login("Guest", "buyer", { guest: true });
+    navigate("/");
+  };
+
   return (
     <div style={styles.page}>
       <div style={styles.card}>
@@ -37,6 +42,10 @@ function Login() {
             >
               👩‍🍳 Seller
             </button>
+            <button type="button" style={styles.skipButton} onClick={handleSkip}>
+              Skip for now → browse as guest buyer
+            </button>
+            <p style={styles.demoNote}>Demo login — no real password needed for judges</p>
           </div>
         ) : (
           <form style={styles.form} onSubmit={handleLogin}>
@@ -164,6 +173,21 @@ const styles = {
     fontSize: "13px",
     cursor: "pointer",
     marginTop: "4px",
+  },
+  skipButton: {
+    background: "transparent",
+    border: "1px dashed rgba(43, 36, 32, 0.3)",
+    padding: "12px",
+    borderRadius: "10px",
+    fontSize: "14px",
+    cursor: "pointer",
+    color: "var(--color-text)",
+    marginTop: "4px",
+  },
+  demoNote: {
+    fontSize: "12px",
+    color: "var(--color-muted)",
+    marginTop: "8px",
   },
 };
 

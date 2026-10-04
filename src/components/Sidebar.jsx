@@ -1,7 +1,9 @@
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
 export default function Sidebar({ isOpen, onClose, categories, selectedCategory, onCategorySelect }) {
   const navigate = useNavigate();
+  const { user } = useAuth();
 
   return (
     <>
@@ -25,13 +27,13 @@ export default function Sidebar({ isOpen, onClose, categories, selectedCategory,
           style={styles.profileSection}
           onClick={() => {
             onClose();
-            navigate("/");
+            navigate("/profile");
           }}
         >
-          <div style={styles.avatar}>👤</div>
+          <div style={styles.avatar}>{user?.role === "seller" ? "👩‍🍳" : "👤"}</div>
           <div>
-            <p style={styles.profileName}>Your Profile</p>
-            <p style={styles.profileSub}>View & edit account</p>
+            <p style={styles.profileName}>{user?.name || "Your Profile"} {user?.guest ? "(Guest)" : ""}</p>
+            <p style={styles.profileSub}>{user?.role === "seller" ? "Seller · orders, earnings, add dish" : "Buyer · orders, reviews, follows"}</p>
           </div>
         </div>
 

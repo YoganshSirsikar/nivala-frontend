@@ -13,8 +13,8 @@ export function AuthProvider({ children }) {
     }
   }, []);
 
-  const login = (name, role) => {
-    const userData = { name, role };
+  const login = (name, role, opts = {}) => {
+    const userData = { name, role, guest: Boolean(opts.guest) };
     setUser(userData);
     localStorage.setItem("NivalaUser", JSON.stringify(userData));
   };
