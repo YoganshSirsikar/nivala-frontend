@@ -11,9 +11,11 @@ function Profile() {
   const { user, logout } = useAuth();
   const [localOrders] = useState(() => getOrders());
   const [remoteOrders, setRemoteOrders] = useState([]);
+  const [buyerRemote, setBuyerRemote] = useState([]);
   const [myDishes, setMyDishes] = useState([]);
   const [kitchenMsg, setKitchenMsg] = useState("");
   const [dishMsg, setDishMsg] = useState("");
+  const [trackingMsg, setTrackingMsg] = useState("");
 
   const isSeller = user?.role === "seller";
   const kitchenName = isSeller ? user?.name : "";
@@ -32,6 +34,20 @@ function Profile() {
     api.listChannelDishes(kitchenName).then(setMyDishes).catch(() => {});
     api.listOrders({ kitchen: kitchenName }).then(setRemoteOrders).catch(() => {});
   }, [isSeller, kitchenName]);
+
+  const refreshBuyer = () => {
+    if (isSeller || !user?.name) return;
+    setTrackingMsg("Checking live status...");
+    api.listOrders({ buyer: user.name })
+      .then((list) => { setBuyerRemote(list); setTrackingMsg(list.length ? `Live: ${list.length} order(s) from cloud.` : "No cloud orders yet for this name."); })
+      .catch(() => setTrackingMsg("Backend offline — showing browser orders only."));
+  };
+
+  useEffect(() => {
+    if (!isSeller && user?.name) {
+      api.listOrders({ buyer: user.name }).then(setBuyerRemote).catch(() => {});
+    }
+  }, [isSeller, user?.name]);
 
   const handleSaveKitchen = async (e) => {
     e.preventDefault();
@@ -167,7 +183,24 @@ function Profile() {
       ) : (
         <>
           <section style={styles.section}>
-            <h2>Order history ({localOrders.length} local)</h2>
+            <h2>Live tracking ({buyerRemote.length} cloud)</h2>
+            <button style={styles.mini} onClick={refreshBuyer}>Refresh live status</button>
+            {trackingMsg && <p><small>{trackingMsg}</small></p>}
+            {buyerRemote.length === 0 ? <p>No cloud orders yet — place an order, then seller updates will appear here.</p> :
+              buyerRemote.map((o) => (
+                <div key={o._id} style={styles.orderCard}>
+                  <strong>{o._id.slice(-6)}</strong> · ₹{o.total} · {o.mode} · <b>{o.status}</b> · ETA ~{o.etaMinutes} min
+                  <div style={styles.timeline}>
+                    {STATUS_FLOW.map((s) => (
+                      <span key={s} style={STATUS_FLOW.indexOf(s) <= STATUS_FLOW.indexOf(o.status) ? styles.dotOn : styles.dot}>{s}</span>
+                    ))}
+                  </div>
+                  <small>{o.items.map((i) => `${i.name} x${i.qty}`).join(", ")}</small>
+                </div>
+              ))}
+          </section>
+          <section style={styles.section}>
+            <h2>Order history ({localOrders.length} on this device)</h2>
             {localOrders.length === 0 ? <p>No orders yet. <button style={styles.link} onClick={() => navigate("/")}>Browse meals →</button></p> :
               localOrders.map((o) => (
                 <div key={o.id} style={styles.orderCard}>
@@ -207,6 +240,9 @@ const styles = {
   orderCard: { borderBottom: "1px solid rgba(43,36,32,0.08)", padding: "10px 0", fontSize: "14px", wordBreak: "break-word" },
   link: { background: "none", border: "none", color: "var(--color-green)", cursor: "pointer", fontSize: "13px", textDecoration: "underline" },
   mini: { margin: "4px 4px 0 0", padding: "6px 10px", borderRadius: "8px", border: "1px solid rgba(43,36,32,0.2)", cursor: "pointer", fontSize: "12px" },
+  timeline: { display: "flex", gap: "6px", flexWrap: "wrap", margin: "8px 0" },
+  dot: { fontSize: "11px", padding: "4px 8px", borderRadius: "99px", background: "#f0ece6", color: "#69746c" },
+  dotOn: { fontSize: "11px", padding: "4px 8px", borderRadius: "99px", background: "#e6f3ea", color: "#2f6e4f", fontWeight: 700 },
   logout: { marginTop: "12px", background: "none", border: "1px solid rgba(43,36,32,0.2)", padding: "10px 20px", borderRadius: "10px", cursor: "pointer" },
 };
 

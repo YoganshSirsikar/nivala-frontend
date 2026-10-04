@@ -97,6 +97,17 @@ function Home() {
           <div className="section-heading"><div><p className="eyebrow">LOVED BY THE COMMUNITY</p><h2>Popular right now</h2></div><button onClick={() => chooseCategory("")}>See all meals →</button></div>
           <div className="dish-row">{featuredDishes.map((dish) => <div key={dish._id} onClick={() => navigate(`/dish/${dish._id}`)}><FoodCard dish={dish} /></div>)}</div>
         </section>
+
+        <section className="home-section">
+          <div className="section-heading"><div><p className="eyebrow">WHY NIVALA</p><h2>Homemade you can trust</h2></div></div>
+          <div className="category-pills">
+            <div className="category-card"><span>✅</span><strong>Verified kitchens</strong><small>Sellers declare hygiene + kitchen details. Verified badge after review.</small></div>
+            <div className="category-card"><span>🧼</span><strong>Hygiene first</strong><small>Small batches, fresh ingredients, allergen notes on every dish.</small></div>
+            <div className="category-card"><span>💬</span><strong>Complaints + refunds</strong><small>Wrong or late order? Message kitchen from order ID. Refund in demo credits for now.</small></div>
+            <div className="category-card"><span>🛵</span><strong>Pickup or delivery</strong><small>Pickup free + fresher. Delivery fee shown upfront, free over ₹499.</small></div>
+          </div>
+          <p className="status-message" style={{ padding: "12px 0 0", fontSize: "13px" }}>Food-business note: home sellers are advised to follow FSSAI home-food guidelines. Nivala shows kitchen, ingredients and allergens before you pay.</p>
+        </section>
       </>}
 
       <section id="discover-dishes" className="home-section discover-section">
