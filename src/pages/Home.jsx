@@ -11,6 +11,43 @@ const categoryIcons = {
   Healthy: "🥗", "North Indian": "🍛", "South Indian": "🥘", Snacks: "🥟",
 };
 
+function OfferFolder({ onRequest }) {
+  const [stage, setStage] = useState(0); // 0 closed, 1 half, 2 full
+  const folderClass = stage === 0 ? "" : stage === 1 ? "open-half" : "open-full";
+  return (
+    <>
+      <div className="offer-doodle" onClick={() => setStage((s) => (s === 0 ? 1 : s === 1 ? 2 : 0))}>
+        <p className="eyebrow">SHH… FIRST TREAT INSIDE 🤫</p>
+        <h3>Tap the folder — dinner’s on us</h3>
+        <div className={`folder ${folderClass}`}>
+          <div className="folder-back" />
+          <div className="folder-letter">
+            <strong>NIVALA50</strong>
+            <p>Flat demo offer + free delivery over ₹499.</p>
+          </div>
+          <div className="folder-front"><span>save for later! ✦</span></div>
+        </div>
+        <small>{stage === 0 ? "Psst… your first treat is hiding in here 👆" : stage === 1 ? "Click again for full view 👆" : "Tap to close"}</small>
+      </div>
+      {stage === 2 && (
+        <div className="letter-overlay" onClick={() => setStage(0)}>
+          <div className="letter-full" onClick={(e) => e.stopPropagation()}>
+            <p className="eyebrow">NIVALA FIRST ORDER</p>
+            <h2>NIVALA50</h2>
+            <p>Flat demo offer on your first homemade meal. Free delivery over ₹499. Pickup always free and fresher.</p>
+            <p className="muted">Can’t find your craving? Request it — home cooks accept with their price.</p>
+            <div className="letter-actions">
+              <button className="primary" onClick={onRequest}>Request a dish →</button>
+              <button className="ghost" onClick={() => setStage(0)}>Close</button>
+            </div>
+            <small>Tap anywhere outside to close</small>
+          </div>
+        </div>
+      )}
+    </>
+  );
+}
+
 function Home() {
   const navigate = useNavigate();
   const { totalItems } = useCart();
@@ -95,7 +132,9 @@ function Home() {
 
         <section id="featured-kitchens" className="home-section">
           <div className="section-heading"><div><p className="eyebrow">LOVED BY THE COMMUNITY</p><h2>Popular right now</h2></div><button onClick={() => chooseCategory("")}>See all meals →</button></div>
-          <div className="dish-row">{featuredDishes.map((dish) => <div key={dish._id} onClick={() => navigate(`/dish/${dish._id}`)}><FoodCard dish={dish} /></div>)}</div>
+          <div className="dish-row">{featuredDishes.map((dish) => <div key={dish._id} onClick={() => navigate(`/dish/${dish._id}`)}><FoodCard dish={dish} /></div>)}
+            <OfferFolder onRequest={() => navigate("/requests")} />
+          </div>
         </section>
 
         <section className="home-section">
@@ -114,6 +153,22 @@ function Home() {
         <div className="section-heading"><div><p className="eyebrow">{isFiltered ? "YOUR RESULTS" : "MORE TO DISCOVER"}</p><h2>{selectedCategory ? selectedCategory : searchTerm ? `Results for “${searchTerm}”` : "All homemade meals"}</h2></div>{isFiltered && <button className="clear-filter" onClick={() => { setSearchTerm(""); setSelectedCategory(""); }}>Clear filters ×</button>}</div>
         {loading ? <p className="status-message">Preparing today’s menu…</p> : filteredDishes.length === 0 ? <p className="status-message">No meals found. Try another search or category.</p> : <div className="dish-grid">{filteredDishes.map((dish) => <div key={dish._id} onClick={() => navigate(`/dish/${dish._id}`)}><FoodCard dish={dish} /></div>)}</div>}
       </section>
+
+      <footer className="nivala-footer">
+        <div>
+          <strong>🍲 Nivala</strong>
+          <p>Homemade food from real home kitchens. Support local cooks.</p>
+        </div>
+        <div>
+          <p className="eyebrow">TRUST</p>
+          <p>Verified kitchens · Hygienic prep · Ingredients + allergens shown · FSSAI home-food guidelines advised</p>
+        </div>
+        <div>
+          <p className="eyebrow">HELP</p>
+          <p>Wrong or late order? Use your order ID in Profile → Orders. Refunds in demo credits for now.</p>
+          <button onClick={() => navigate("/requests")}>Request a dish →</button>
+        </div>
+      </footer>
     </main>
   );
 }
