@@ -30,3 +30,8 @@
 .review-list { display:flex; flex-direction:column; gap:10px; }
 .review-card { background:var(--color-bg); border-radius:12px; padding:12px 14px; font-size:14px; }
 .verified-order { background:#e6f3ea; color:#2f6e4f; font-size:11px; font-weight:700; padding:3px 8px; border-radius:999px; margin-left:6px; }
+
+.dish-grid > div { min-width: 0; }
+.dish-grid .food-card { width: 100% !important; min-width: 0; }
+.dish-grid .food-card-info h3 { white-space: normal !important; overflow: visible !important; text-overflow: clip !important; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; min-height: 2.4em; font-size: 13px !important; line-height: 1.2; }
+.dish-grid .food-card-channel { white-space: normal !important; overflow: visible !important; }
