@@ -38,7 +38,7 @@ function OfferFolder({ onRequest }) {
             <p>Flat offer on your first homemade meal. Free delivery over ₹499. Pickup always free and fresher.</p>
             <p className="muted">Can’t find your craving? Request it — home cooks accept with their price.</p>
             <div className="letter-actions">
-              <button className="primary" onClick={onRequest}>Request a dish →</button>
+              <button className="primary" onClick={() => { setStage(0); document.getElementById("discover-dishes")?.scrollIntoView({ behavior: "smooth" }); }}>Browse dishes →</button>
               <button className="ghost" onClick={() => setStage(0)}>Close</button>
             </div>
             <small>Tap anywhere outside to close</small>
