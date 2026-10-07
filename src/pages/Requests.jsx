@@ -69,7 +69,7 @@ function Requests() {
             <input style={styles.input} placeholder="Locality" value={form.locality} onChange={(e) => setForm({ ...form, locality: e.target.value })} />
           </div>
           <input style={styles.input} type="number" placeholder="Price you'll pay ₹" value={form.priceOffer} onChange={(e) => setForm({ ...form, priceOffer: e.target.value })} />
-          <textarea style={styles.input} placeholder="Notes — spice, quantity, time..." value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} />
+          <textarea style={{ ...styles.input, resize: "none" }} placeholder="Notes — spice, quantity, time..." value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} rows={3} />
           <button style={styles.primary} type="submit">Post request</button>
           {msg && <small>{msg}</small>}
         </form>
