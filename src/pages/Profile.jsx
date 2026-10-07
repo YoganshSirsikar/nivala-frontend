@@ -1,11 +1,9 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import { getOrders } from "../utils/orders";
+import { getOrders, deriveLiveStatus, minutesLeft, STATUS_FLOW } from "../utils/orders";
 import { api } from "../utils/api";
 import Icon from "../components/Icon";
-
-const STATUS_FLOW = ["Placed", "Accepted", "Preparing", "Ready", "Completed"];
 
 function Profile() {
   const navigate = useNavigate();
@@ -49,6 +47,30 @@ function Profile() {
       api.listOrders({ buyer: user.name }).then(setBuyerRemote).catch(() => {});
     }
   }, [isSeller, user?.name]);
+
+  // Tick every 30s so countdowns + live stages move in real time.
+  // Auto-close: when the clock passes ETA, persist Completed once.
+  const [, setNow] = useState(Date.now());
+  const closedRef = useRef(new Set());
+  useEffect(() => {
+    const t = setInterval(() => setNow(Date.now()), 30000);
+    return () => clearInterval(t);
+  }, []);
+  useEffect(() => {
+    const all = [...buyerRemote, ...remoteOrders];
+    all.forEach((o) => {
+      if (!o._id || closedRef.current.has(o._id)) return;
+      if (deriveLiveStatus(o) === "Completed" && o.status !== "Completed" && o.status !== "Cancelled") {
+        closedRef.current.add(o._id);
+        api.updateOrderStatus(o._id, "Completed")
+          .then((u) => {
+            setBuyerRemote((p) => p.map((x) => (x._id === u._id ? u : x)));
+            setRemoteOrders((p) => p.map((x) => (x._id === u._id ? u : x)));
+          })
+          .catch(() => {});
+      }
+    });
+  });
 
   const handleSaveKitchen = async (e) => {
     e.preventDefault();
@@ -166,11 +188,11 @@ function Profile() {
             {remoteOrders.length === 0 && <p>No real backend orders yet — place a test order as buyer.</p>}
             {remoteOrders.map((o) => (
               <div key={o._id} style={styles.orderCard}>
-                <strong>{o._id.slice(-6)}</strong> · {o.buyer} · ₹{o.total} · <b>{o.status}</b> · {o.mode} · ETA ~{o.etaMinutes} min
+                <strong>{o._id.slice(-6)}</strong> · {o.buyer} · ₹{o.total} · <b>{deriveLiveStatus(o)}</b> · {o.mode} · {minutesLeft(o) > 0 ? `${minutesLeft(o)} min left` : "time over — auto-completed"}
                 <br /><small>{o.items.map((i) => `${i.name} x${i.qty}`).join(", ")}</small>
                 <br />
                 {STATUS_FLOW.filter((s) => s !== "Placed").map((s) => (
-                  <button key={s} style={styles.mini} disabled={o.status === s} onClick={() => advanceStatus(o, s)}>{s}</button>
+                  <button key={s} style={styles.mini} disabled={deriveLiveStatus(o) === s} onClick={() => advanceStatus(o, s)}>{s}</button>
                 ))}
               </div>
             ))}
@@ -190,10 +212,10 @@ function Profile() {
             {buyerRemote.length === 0 ? <p>No cloud orders yet — place an order, then seller updates will appear here.</p> :
               buyerRemote.map((o) => (
                 <div key={o._id} style={styles.orderCard}>
-                  <strong>{o._id.slice(-6)}</strong> · ₹{o.total} · {o.mode} · <b>{o.status}</b> · ETA ~{o.etaMinutes} min
+                  <strong>{o._id.slice(-6)}</strong> · ₹{o.total} · {o.mode} · <b>{deriveLiveStatus(o)}</b> · {minutesLeft(o) > 0 ? `${minutesLeft(o)} min left` : "completed"}
                   <div style={styles.timeline}>
                     {STATUS_FLOW.map((s) => (
-                      <span key={s} style={STATUS_FLOW.indexOf(s) <= STATUS_FLOW.indexOf(o.status) ? styles.dotOn : styles.dot}>{s}</span>
+                      <span key={s} style={STATUS_FLOW.indexOf(s) <= STATUS_FLOW.indexOf(deriveLiveStatus(o)) ? styles.dotOn : styles.dot}>{s}</span>
                     ))}
                   </div>
                   <small>{o.items.map((i) => `${i.name} x${i.qty}`).join(", ")}</small>
