@@ -16,9 +16,12 @@ function Checkout() {
   const payment = "cod";
 
   const itemCount = cartItems.reduce((s, i) => s + i.quantity, 0);
-  const deliveryFee = mode === "pickup" ? 0 : totalPrice > 499 ? 0 : 29;
-  const serviceFee = Math.round(totalPrice * 0.02);
-  const grandTotal = totalPrice + deliveryFee + serviceFee;
+  const [promoInput, setPromoInput] = useState("");
+  const promoApplied = promoInput.trim().toUpperCase() === "NIVALA50";
+  const discount = promoApplied ? Math.min(50, totalPrice) : 0;
+  const deliveryFee = mode === "pickup" ? 0 : totalPrice - discount > 499 ? 0 : 29;
+  const serviceFee = Math.round((totalPrice - discount) * 0.02);
+  const grandTotal = totalPrice - discount + deliveryFee + serviceFee;
   const eta = estimateDeliveryMinutes(itemCount, mode);
 
   const handlePlaceOrder = async () => {
@@ -29,9 +32,11 @@ function Checkout() {
       subtotal: totalPrice,
       deliveryFee,
       serviceFee,
+      discount,
+      promoCode: promoApplied ? "NIVALA50" : "",
       total: grandTotal,
       mode,
-      payment: `${payment} (demo)`,
+      payment: "cod",
       address: mode === "pickup" ? "Pickup from kitchen" : address,
       kitchen: cartItems[0]?.channel || "",
       etaMinutes: eta,
@@ -110,7 +115,16 @@ function Checkout() {
       </div>
 
       <div style={styles.section}>
-        <p style={styles.sectionLabel}>3 · Price breakdown</p>
+        <p style={styles.sectionLabel}>3 · Promo code</p>
+        <div style={styles.row}>
+          <input style={{ ...styles.addressInput, minHeight: "0", width: "200px" }} placeholder="Try NIVALA50" value={promoInput} onChange={(e) => setPromoInput(e.target.value)} />
+        </div>
+        {promoInput.trim() && !promoApplied ? <p style={styles.errorHint}>Invalid code — try NIVALA50</p> : null}
+        {promoApplied ? <p style={styles.successHint}>NIVALA50 applied — ₹{discount} off your first order</p> : null}
+      </div>
+
+      <div style={styles.section}>
+        <p style={styles.sectionLabel}>4 · Price breakdown</p>
         {cartItems.map((item) => (
           <div key={item._id} style={styles.summaryItem}>
             <span>{item.name} x{item.quantity}</span>
@@ -118,9 +132,10 @@ function Checkout() {
           </div>
         ))}
         <div style={styles.summaryItem}><span>Subtotal</span><span>₹{totalPrice}</span></div>
-        <div style={styles.summaryItem}><span>Delivery fee {totalPrice > 499 && mode === "delivery" ? "(FREE over ₹499)" : ""}</span><span>₹{deliveryFee}</span></div>
+        {discount > 0 && <div style={styles.summaryItem}><span>NIVALA50 discount</span><span>−₹{discount}</span></div>}
+        <div style={styles.summaryItem}><span>Delivery fee {totalPrice - discount > 499 && mode === "delivery" ? "(FREE over ₹499)" : ""}</span><span>₹{deliveryFee}</span></div>
         <div style={styles.summaryItem}><span>Service fee (2% supports home chefs)</span><span>₹{serviceFee}</span></div>
-        <div style={styles.summaryTotal}><span>Total</span><span style={styles.totalPrice}>₹{grandTotal}</span></div>
+        <div style={styles.summaryTotal}><span>Total (COD)</span><span style={styles.totalPrice}>₹{grandTotal}</span></div>
       </div>
 
       <button style={styles.placeOrderButton} onClick={handlePlaceOrder} disabled={mode === "delivery" && !address.trim()}>
@@ -143,6 +158,8 @@ const styles = {
   chip: { padding: "10px 16px", borderRadius: "20px", border: "1px solid rgba(43,36,32,0.2)", background: "transparent", cursor: "pointer" },
   activeChip: { padding: "10px 16px", borderRadius: "20px", border: "2px solid var(--color-green)", background: "rgba(47,110,79,0.08)", cursor: "pointer", fontWeight: 700 },
   hint: { fontSize: "13px", color: "var(--color-muted)" },
+  errorHint: { fontSize: "13px", color: "#c0392b" },
+  successHint: { fontSize: "13px", color: "#2f6e4f", fontWeight: 700 },
   addressInput: { width: "100%", minHeight: "80px", padding: "12px", borderRadius: "10px", border: "1px solid rgba(43, 36, 32, 0.15)", fontFamily: "var(--font-body)", fontSize: "14px", resize: "vertical" },
   summaryItem: { display: "flex", justifyContent: "space-between", fontSize: "14px", marginBottom: "8px", color: "var(--color-text)" },
   summaryTotal: { display: "flex", justifyContent: "space-between", fontSize: "17px", fontWeight: 700, marginTop: "12px", paddingTop: "12px", borderTop: "1px solid rgba(43, 36, 32, 0.1)" },
