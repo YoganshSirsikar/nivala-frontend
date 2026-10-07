@@ -35,7 +35,6 @@ function Login() {
   return (
     <div style={styles.page}>
       <div style={styles.card}>
-        <img src="/nivala-logo.png" alt="Nivala logo" style={styles.logoImage} />
         <h1 style={styles.logo}>Nivala</h1>
         <p style={styles.tagline}>Homemade food, from real kitchens</p>
 
@@ -121,15 +120,6 @@ const styles = {
     fontWeight: 700,
     fontSize: "26px",
     margin: "0 0 6px 0",
-  },
-  logoImage: {
-    width: "110px",
-    height: "84px",
-    objectFit: "cover",
-    objectPosition: "center 42%",
-    display: "block",
-    margin: "0 auto 6px",
-    mixBlendMode: "multiply",
   },
   tagline: {
     color: "var(--color-muted)",
