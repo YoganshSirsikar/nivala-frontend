@@ -1,5 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { useCart } from "../context/CartContext";
+import Icon from "../components/Icon";
 
 function Cart() {
   const navigate = useNavigate();
@@ -9,7 +10,7 @@ function Cart() {
     <div className="app-page cart-page" style={styles.page}>
       <header style={styles.header}>
         <h1 style={styles.logo} onClick={() => navigate("/")}>
-          🍲 Nivala
+          <span style={{ display: "inline-flex", verticalAlign: "middle", marginRight: 6 }}><Icon name="plate" size={22} /></span>Nivala
         </h1>
         <button style={styles.backButton} onClick={() => navigate("/")}>
           ← Back

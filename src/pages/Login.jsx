@@ -2,6 +2,8 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
+import Icon from "../components/Icon";
+
 function Login() {
   const navigate = useNavigate();
   const { login } = useAuth();
@@ -33,7 +35,7 @@ function Login() {
   return (
     <div style={styles.page}>
       <div style={styles.card}>
-        <h1 style={styles.logo}>🍲 Nivala</h1>
+        <h1 style={styles.logo}><span style={{ display: "inline-flex", verticalAlign: "middle", marginRight: 6 }}><Icon name="plate" size={24} /></span>Nivala</h1>
         <p style={styles.tagline}>Homemade food, from real kitchens</p>
 
         {!role ? (
@@ -43,13 +45,13 @@ function Login() {
               style={styles.roleButton}
               onClick={() => { setRole("buyer"); setName(""); setPassword(""); setErrors({ name: "", password: "" }); }}
             >
-              🍽️ Buyer
+              <span style={{ display: "inline-flex", verticalAlign: "middle", marginRight: 8 }}><Icon name="plate" size={18} /></span>Buyer
             </button>
             <button
               style={{ ...styles.roleButton, ...styles.sellerButton }}
               onClick={() => { setRole("seller"); setName(""); setPassword(""); setErrors({ name: "", password: "" }); }}
             >
-              👩‍🍳 Seller
+              <span style={{ display: "inline-flex", verticalAlign: "middle", marginRight: 8 }}><Icon name="chef" size={18} /></span>Seller
             </button>
             <button type="button" style={styles.skipButton} onClick={handleSkip}>
               Skip for now → browse as guest buyer

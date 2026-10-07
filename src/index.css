@@ -99,3 +99,10 @@
 .letter-actions { display: flex; gap: 10px; justify-content: center; margin: 14px 0 8px; flex-wrap: wrap; }
 .letter-actions .primary { background: #e56437; color: #fff; border: none; padding: 12px 20px; border-radius: 999px; font-weight: 700; cursor: pointer; }
 .letter-actions .ghost { background: transparent; border: 1px solid #ccc; padding: 12px 20px; border-radius: 999px; cursor: pointer; }
+
+.brand-button { display: inline-flex; align-items: center; gap: 8px; }
+.menu-button, .cart-button { display: inline-grid; place-items: center; }
+.trust-avatars { display: inline-flex; align-items: center; }
+.category-card svg { margin-bottom: auto; color: var(--color-green); }
+.trust-strip svg { flex-shrink: 0; }
+.food-card-meta svg, .chef-link svg, .dish-facts svg { vertical-align: middle; }

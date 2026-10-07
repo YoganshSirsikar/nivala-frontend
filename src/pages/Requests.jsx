@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { api } from "../utils/api";
+import Icon from "../components/Icon";
 
 const LOCAL_KEY = "nivala-requests-v1";
 const loadLocal = () => { try { return JSON.parse(localStorage.getItem(LOCAL_KEY) || "[]"); } catch { return []; } };
@@ -55,7 +56,7 @@ function Requests() {
   return (
     <main className="app-page" style={styles.page}>
       <header style={styles.header}>
-        <h1 style={styles.logo} onClick={() => navigate("/")}>🍲 Nivala</h1>
+        <h1 style={styles.logo} onClick={() => navigate("/")}><span style={{ display: "inline-flex", verticalAlign: "middle", marginRight: 6 }}><Icon name="plate" size={20} /></span>Nivala</h1>
         <button style={styles.back} onClick={() => navigate("/")}>← Back</button>
       </header>
       <p className="eyebrow">CUSTOMER → REQUEST → HOME COOK → ORDER</p>

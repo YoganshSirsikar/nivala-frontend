@@ -1,5 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import Icon from "./Icon";
 
 export default function Sidebar({ isOpen, onClose, categories, selectedCategory, onCategorySelect }) {
   const navigate = useNavigate();
@@ -30,7 +31,7 @@ export default function Sidebar({ isOpen, onClose, categories, selectedCategory,
             navigate("/profile");
           }}
         >
-          <div style={styles.avatar}>{user?.role === "seller" ? "👩‍🍳" : "👤"}</div>
+          <div style={styles.avatar}><Icon name={user?.role === "seller" ? "chef" : "user"} size={20} /></div>
           <div>
             <p style={styles.profileName}>{user?.name || "Your Profile"} {user?.guest ? "(Guest)" : ""}</p>
             <p style={styles.profileSub}>{user?.role === "seller" ? "Seller · orders, earnings, add dish" : "Buyer · orders, reviews, follows"}</p>

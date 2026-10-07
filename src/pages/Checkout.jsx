@@ -4,6 +4,7 @@ import { useCart } from "../context/CartContext";
 import { useAuth } from "../context/AuthContext";
 import { saveOrder, estimateDeliveryMinutes } from "../utils/orders";
 import { api } from "../utils/api";
+import Icon from "../components/Icon";
 
 function Checkout() {
   const navigate = useNavigate();
@@ -52,7 +53,7 @@ function Checkout() {
     return (
       <div className="app-page checkout-page" style={styles.page}>
         <header style={styles.header}>
-          <h1 style={styles.logo} onClick={() => navigate("/")}>🍲 Nivala</h1>
+          <h1 style={styles.logo} onClick={() => navigate("/")}><span style={{ display: "inline-flex", verticalAlign: "middle", marginRight: 6 }}><Icon name="plate" size={20} /></span>Nivala</h1>
         </header>
         <div style={styles.empty}>
           <p>Your cart is empty.</p>
@@ -66,7 +67,7 @@ function Checkout() {
     return (
       <div className="app-page checkout-page" style={styles.page}>
         <header style={styles.header}>
-          <h1 style={styles.logo} onClick={() => navigate("/")}>🍲 Nivala</h1>
+          <h1 style={styles.logo} onClick={() => navigate("/")}><span style={{ display: "inline-flex", verticalAlign: "middle", marginRight: 6 }}><Icon name="plate" size={20} /></span>Nivala</h1>
         </header>
         <div style={styles.confirmation}>
           <div style={styles.checkCircle}>✓</div>
@@ -86,7 +87,7 @@ function Checkout() {
   return (
     <div className="app-page checkout-page" style={styles.page}>
       <header style={styles.header}>
-        <h1 style={styles.logo} onClick={() => navigate("/")}>🍲 Nivala</h1>
+        <h1 style={styles.logo} onClick={() => navigate("/")}><span style={{ display: "inline-flex", verticalAlign: "middle", marginRight: 6 }}><Icon name="plate" size={20} /></span>Nivala</h1>
         <button style={styles.backButton} onClick={() => navigate("/cart")}>← Back to Cart</button>
       </header>
 
@@ -95,8 +96,8 @@ function Checkout() {
       <div style={styles.section}>
         <p style={styles.sectionLabel}>1 · Delivery or pickup (homemade = needs time)</p>
         <div style={styles.row}>
-          <button style={mode === "delivery" ? styles.activeChip : styles.chip} onClick={() => setMode("delivery")}>🛵 Delivery ~{estimateDeliveryMinutes(itemCount, "delivery")} min</button>
-          <button style={mode === "pickup" ? styles.activeChip : styles.chip} onClick={() => setMode("pickup")}>🏠 Pickup ~{estimateDeliveryMinutes(itemCount, "pickup")} min</button>
+          <button style={mode === "delivery" ? styles.activeChip : styles.chip} onClick={() => setMode("delivery")}><span style={{ display: "inline-flex", verticalAlign: "middle", marginRight: 6 }}><Icon name="scooter" size={16} /></span>Delivery ~{estimateDeliveryMinutes(itemCount, "delivery")} min</button>
+          <button style={mode === "pickup" ? styles.activeChip : styles.chip} onClick={() => setMode("pickup")}><span style={{ display: "inline-flex", verticalAlign: "middle", marginRight: 6 }}><Icon name="home" size={16} /></span>Pickup ~{estimateDeliveryMinutes(itemCount, "pickup")} min</button>
         </div>
         {mode === "delivery" ? (
           <textarea style={styles.addressInput} placeholder="Full delivery address with landmark..." value={address} onChange={(e) => setAddress(e.target.value)} />

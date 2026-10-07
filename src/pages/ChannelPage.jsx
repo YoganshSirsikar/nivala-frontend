@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import FoodCard from "../components/FoodCard";
+import Icon from "../components/Icon";
 import { fallbackFoodImage, getDishImage } from "../utils/dishMeta";
 
 const getKitchenDetails = (channel, dishes) => {
@@ -47,7 +48,7 @@ function ChannelPage() {
   return (
     <main className="app-page kitchen-page">
       <header className="kitchen-header">
-        <button className="brand-button" onClick={() => navigate("/")}><span>🍲</span> Nivala</button>
+        <button className="brand-button" onClick={() => navigate("/")}><Icon name="plate" size={20} /> Nivala</button>
         <button className="back-home" onClick={() => navigate("/")}>← Back to home</button>
       </header>
 
@@ -65,10 +66,10 @@ function ChannelPage() {
         </section>
 
         <section className="kitchen-stats">
-          <div><span>★</span><p><strong>{averageRating}</strong><br />Average rating</p></div>
-          <div><span>🍽</span><p><strong>{channelDishes.length}</strong><br />Dishes available</p></div>
-          <div><span>♡</span><p><strong>{isFollowing ? "You follow" : "Follow"}</strong><br />for menu updates</p></div>
-          <div><span>⌛</span><p><strong>{kitchen.years}</strong><br />Cooking experience</p></div>
+          <div><Icon name="star" size={20} /><p><strong>{averageRating}</strong><br />Average rating</p></div>
+          <div><Icon name="plate" size={20} /><p><strong>{channelDishes.length}</strong><br />Dishes available</p></div>
+          <div><Icon name="heart" size={20} /><p><strong>{isFollowing ? "You follow" : "Follow"}</strong><br />for menu updates</p></div>
+          <div><Icon name="clock" size={20} /><p><strong>{kitchen.years}</strong><br />Cooking experience</p></div>
         </section>
 
         <section className="kitchen-story-section">

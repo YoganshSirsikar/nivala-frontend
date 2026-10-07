@@ -1,5 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { fallbackFoodImage, getDishImage, getDishMeta } from "../utils/dishMeta";
+import Icon from "../components/Icon";
 
 export default function FoodCard({ dish }) {
   const navigate = useNavigate();
@@ -28,7 +29,7 @@ export default function FoodCard({ dish }) {
         <button className="food-card-channel" onClick={handleChannelClick}>
           {dish.channel}
         </button>
-        <div className="food-card-meta"><span>⏱ {meta.prepTime}</span><span>★ {dish.rating} ({meta.reviewCount})</span></div>
+        <div className="food-card-meta"><span style={{ display: "inline-flex", alignItems: "center", gap: 4 }}><Icon name="clock" size={12} /> {meta.prepTime}</span><span>★ {dish.rating} ({meta.reviewCount})</span></div>
         <div className="food-card-bottom">
           <span className="food-card-price">₹{dish.price}</span>
           <span className={meta.isAvailable ? "availability" : "availability unavailable"}>{meta.isAvailable ? "Available" : "Unavailable"}</span>

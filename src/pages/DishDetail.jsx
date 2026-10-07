@@ -5,6 +5,7 @@ import { useAuth } from "../context/AuthContext";
 import { fallbackFoodImage, getDishImage, getDishMeta } from "../utils/dishMeta";
 import { getReviews, addReview } from "../utils/reviews";
 import { api } from "../utils/api";
+import Icon from "../components/Icon";
 
 function DishDetail() {
   const { id } = useParams();
@@ -90,7 +91,7 @@ function DishDetail() {
     <div className="app-page detail-page" style={styles.page}>
       <header style={styles.header}>
         <h1 style={styles.logo} onClick={() => navigate("/")}>
-          🍲 Nivala
+          <span style={{ display: "inline-flex", verticalAlign: "middle", marginRight: 6 }}><Icon name="plate" size={22} /></span>Nivala
         </h1>
         <button style={styles.backButton} onClick={() => navigate("/")}>
           ← Back
@@ -107,9 +108,9 @@ function DishDetail() {
         <div className="dish-main-info">
           <p className="eyebrow">{dish.category || "HOME-COOKED FAVOURITE"}</p>
           <h1>{dish.name}</h1>
-          <button className="chef-link" onClick={() => navigate(`/channel/${encodeURIComponent(dish.channel)}`)}>👩‍🍳 From {dish.channel} <span>→</span></button>
+          <button className="chef-link" onClick={() => navigate(`/channel/${encodeURIComponent(dish.channel)}`)}><Icon name="chef" size={14} /> From {dish.channel} <span>→</span></button>
           <div className="dish-price-row"><strong>₹{dish.price}</strong><span>★ {summary.avg} <small>({summary.count} ratings)</small></span></div>
-          <div className="dish-facts"><div><span>⏱</span><p><strong>{meta.prepTime}</strong><br />Preparation</p></div><div><span>🍽</span><p><strong>{meta.serves}</strong><br />Portion size</p></div><div><span>🏡</span><p><strong>Home made</strong><br />Made to order</p></div></div>
+          <div className="dish-facts"><div><Icon name="clock" size={20} /><p><strong>{meta.prepTime}</strong><br />Preparation</p></div><div><Icon name="plate" size={20} /><p><strong>{meta.serves}</strong><br />Portion size</p></div><div><Icon name="home" size={20} /><p><strong>Home made</strong><br />Made to order</p></div></div>
           <p className="dish-description">{meta.story}</p>
           <div className="dish-actions">
             <button className="add-to-cart" disabled={!meta.isAvailable} onClick={handleAddToCart}>{showAdded ? "✓ Added to cart" : "Add to cart"}</button>

@@ -2,13 +2,14 @@ import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import FoodCard from "../components/FoodCard";
 import Sidebar from "../components/Sidebar";
+import Icon from "../components/Icon";
 import { useCart } from "../context/CartContext";
 import { useAuth } from "../context/AuthContext";
 import { fallbackFoodImage, getDishImage } from "../utils/dishMeta";
 
 const categoryIcons = {
-  "Sweets & Snacks": "🍬", "Popular Today": "🔥", "Try Something New": "✨",
-  Healthy: "🥗", "North Indian": "🍛", "South Indian": "🥘", Snacks: "🥟",
+  "Sweets & Snacks": "plate", "Popular Today": "star", "Try Something New": "spark",
+  Healthy: "leaf", "North Indian": "plate", "South Indian": "plate", Snacks: "plate",
 };
 
 function OfferFolder({ onRequest }) {
@@ -17,7 +18,7 @@ function OfferFolder({ onRequest }) {
   return (
     <>
       <div className="offer-doodle" onClick={() => setStage((s) => (s === 0 ? 1 : s === 1 ? 2 : 0))}>
-        <p className="eyebrow">SHH… FIRST TREAT INSIDE 🤫</p>
+        <p className="eyebrow">SHH… FIRST TREAT INSIDE</p>
         <h3>Tap the folder — dinner’s on us</h3>
         <div className={`folder ${folderClass}`}>
           <div className="folder-back" />
@@ -25,9 +26,9 @@ function OfferFolder({ onRequest }) {
             <strong>NIVALA50</strong>
             <p>Flat demo offer + free delivery over ₹499.</p>
           </div>
-          <div className="folder-front"><span>save for later! ✦</span></div>
+          <div className="folder-front"><span>save for later</span></div>
         </div>
-        <small>{stage === 0 ? "Psst… your first treat is hiding in here 👆" : stage === 1 ? "Click again for full view 👆" : "Tap to close"}</small>
+        <small>{stage === 0 ? "Your first treat is hiding in here" : stage === 1 ? "Click again for full view" : "Tap to close"}</small>
       </div>
       {stage === 2 && (
         <div className="letter-overlay" onClick={() => setStage(0)}>
@@ -86,13 +87,13 @@ function Home() {
     <main className="home-page">
       <header className="home-header">
         <div className="header-brand">
-          <button className="menu-button" aria-label="Open menu" onClick={() => setIsSidebarOpen(true)}>☰</button>
-          <button className="brand-button" onClick={() => chooseCategory("")}><span>🍲</span> Nivala</button>
+          <button className="menu-button" aria-label="Open menu" onClick={() => setIsSidebarOpen(true)}><Icon name="menu" /></button>
+          <button className="brand-button" onClick={() => chooseCategory("")}><Icon name="plate" size={22} /> Nivala</button>
         </div>
-        <label className="home-search"><span aria-hidden="true">⌕</span><input type="search" placeholder="Search for dishes or kitchens" value={searchTerm} onChange={(event) => { setSearchTerm(event.target.value); setSelectedCategory(""); }} /></label>
+        <label className="home-search"><Icon name="search" size={18} /><input type="search" placeholder="Search for dishes or kitchens" value={searchTerm} onChange={(event) => { setSearchTerm(event.target.value); setSelectedCategory(""); }} /></label>
         <div className="header-actions">
-          <button className="cart-button" aria-label="View cart" onClick={() => navigate("/cart")}>🛒{totalItems > 0 && <span>{totalItems}</span>}</button>
-          <div className="welcome-user">Hi, {user?.name || "there"} <span>👋</span></div>
+          <button className="cart-button" aria-label="View cart" onClick={() => navigate("/cart")}><Icon name="cart" size={20} />{totalItems > 0 && <span>{totalItems}</span>}</button>
+          <div className="welcome-user">Hi, {user?.name || "there"}</div>
           <button className="logout-button" onClick={() => { logout(); navigate("/login"); }}>Logout</button>
         </div>
       </header>
@@ -106,7 +107,7 @@ function Home() {
             <h1>Food that feels like <em>home.</em></h1>
             <p className="hero-description">Discover comforting, freshly made meals from passionate home chefs in your community.</p>
             <div className="hero-actions"><button className="primary-action" onClick={() => document.getElementById("discover-dishes")?.scrollIntoView({ behavior: "smooth" })}>Explore meals <span>→</span></button><button className="text-action" onClick={() => document.getElementById("featured-kitchens")?.scrollIntoView({ behavior: "smooth" })}>Meet our kitchens</button></div>
-            <div className="hero-trust"><span className="trust-avatars">🍲 🧑‍🍳 👩‍🍳</span><p><strong>Made with care</strong><br />by local home chefs</p></div>
+            <div className="hero-trust"><span className="trust-avatars"><Icon name="chef" size={20} /></span><p><strong>Made with care</strong><br />by local home chefs</p></div>
           </div>
           <div className="hero-visual" aria-label="A selection of home-cooked meals">
             {featuredDishes.slice(0, 3).map((dish, index) => <img key={dish._id} className={`hero-food hero-food-${index + 1}`} src={getDishImage(dish)} alt={dish.name} onError={(event) => { event.currentTarget.onerror = null; event.currentTarget.src = fallbackFoodImage; }} />)}
@@ -116,13 +117,13 @@ function Home() {
 
         <section className="category-section" aria-labelledby="browse-categories">
           <div className="section-heading"><div><p className="eyebrow">FIND YOUR FAVOURITE</p><h2 id="browse-categories">What are you craving?</h2></div><button onClick={() => setIsSidebarOpen(true)}>View all categories →</button></div>
-          <div className="category-pills">{categories.map((category) => <button key={category} className="category-card" onClick={() => chooseCategory(category)}><span>{categoryIcons[category] || "🍽️"}</span><strong>{category}</strong><small>Explore meals →</small></button>)}</div>
+          <div className="category-pills">{categories.map((category) => <button key={category} className="category-card" onClick={() => chooseCategory(category)}><Icon name={categoryIcons[category] || "plate"} size={28} /><strong>{category}</strong><small>Explore meals →</small></button>)}</div>
         </section>
 
         <section className="trust-strip">
-          <div><span>🏠</span><p><strong>Local home kitchens</strong><br />Meals made in your community</p></div>
-          <div><span>🌿</span><p><strong>Fresh, real ingredients</strong><br />Comfort food made with care</p></div>
-          <div><span>💛</span><p><strong>Support home chefs</strong><br />Every order empowers a local cook</p></div>
+          <div><Icon name="home" size={22} /><p><strong>Local home kitchens</strong><br />Meals made in your community</p></div>
+          <div><Icon name="leaf" size={22} /><p><strong>Fresh, real ingredients</strong><br />Comfort food made with care</p></div>
+          <div><Icon name="heart" size={22} /><p><strong>Support home chefs</strong><br />Every order empowers a local cook</p></div>
         </section>
 
         <section className="home-section">
@@ -140,10 +141,10 @@ function Home() {
         <section className="home-section">
           <div className="section-heading"><div><p className="eyebrow">WHY NIVALA</p><h2>Homemade you can trust</h2></div></div>
           <div className="category-pills">
-            <div className="category-card"><span>✅</span><strong>Verified kitchens</strong><small>Sellers declare hygiene + kitchen details. Verified badge after review.</small></div>
-            <div className="category-card"><span>🧼</span><strong>Hygiene first</strong><small>Small batches, fresh ingredients, allergen notes on every dish.</small></div>
-            <div className="category-card"><span>💬</span><strong>Complaints + refunds</strong><small>Wrong or late order? Message kitchen from order ID. Refund in demo credits for now.</small></div>
-            <div className="category-card"><span>🛵</span><strong>Pickup or delivery</strong><small>Pickup free + fresher. Delivery fee shown upfront, free over ₹499.</small></div>
+            <div className="category-card"><Icon name="shield" size={28} /><strong>Verified kitchens</strong><small>Sellers declare hygiene + kitchen details. Verified badge after review.</small></div>
+            <div className="category-card"><Icon name="leaf" size={28} /><strong>Hygiene first</strong><small>Small batches, fresh ingredients, allergen notes on every dish.</small></div>
+            <div className="category-card"><Icon name="chat" size={28} /><strong>Complaints + refunds</strong><small>Wrong or late order? Message kitchen from order ID. Refund in demo credits for now.</small></div>
+            <div className="category-card"><Icon name="scooter" size={28} /><strong>Pickup or delivery</strong><small>Pickup free + fresher. Delivery fee shown upfront, free over ₹499.</small></div>
           </div>
           <p className="status-message" style={{ padding: "12px 0 0", fontSize: "13px" }}>Food-business note: home sellers are advised to follow FSSAI home-food guidelines. Nivala shows kitchen, ingredients and allergens before you pay.</p>
         </section>
@@ -156,7 +157,7 @@ function Home() {
 
       <footer className="nivala-footer">
         <div>
-          <strong>🍲 Nivala</strong>
+          <strong><span style={{ display: "inline-flex", verticalAlign: "middle", marginRight: 6 }}><Icon name="plate" size={20} /></span>Nivala</strong>
           <p>Homemade food from real home kitchens. Support local cooks.</p>
         </div>
         <div>

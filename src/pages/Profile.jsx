@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { getOrders } from "../utils/orders";
 import { api } from "../utils/api";
+import Icon from "../components/Icon";
 
 const STATUS_FLOW = ["Placed", "Accepted", "Preparing", "Ready", "Completed"];
 
@@ -112,12 +113,12 @@ function Profile() {
   return (
     <main className="app-page" style={styles.page}>
       <header style={styles.header}>
-        <h1 style={styles.logo} onClick={() => navigate("/")}>🍲 Nivala</h1>
+        <h1 style={styles.logo} onClick={() => navigate("/")}><span style={{ display: "inline-flex", verticalAlign: "middle", marginRight: 6 }}><Icon name="plate" size={20} /></span>Nivala</h1>
         <button style={styles.backButton} onClick={() => navigate("/")}>← Back</button>
       </header>
 
       <p className="eyebrow">{isSeller ? "SELLER DASHBOARD (DEMO-LIVE)" : "BUYER PROFILE"}{user?.guest ? " · GUEST" : ""}</p>
-      <h1 style={styles.title}>Hi, {user?.name || "there"} 👋</h1>
+      <h1 style={styles.title}>Hi, {user?.name || "there"}</h1>
       <p style={styles.sub}>{isSeller
         ? "Same homepage as buyers. Manage your kitchen, dishes and orders here. Buyers see wait times because food is homemade."
         : "Your orders, reviews and followed kitchens live here."}</p>
