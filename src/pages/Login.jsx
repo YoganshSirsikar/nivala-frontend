@@ -34,6 +34,8 @@ function Login() {
 
   return (
     <div style={styles.page}>
+      <video autoPlay muted loop playsInline src="/login-bg.mp4" style={styles.video} />
+      <div style={styles.overlay} />
       <div style={styles.card}>
         <h1 style={styles.logo}>Nivala</h1>
         <p style={styles.tagline}>Homemade food, from real kitchens</p>
@@ -97,15 +99,30 @@ function Login() {
 
 const styles = {
   page: {
-    backgroundColor: "var(--color-bg)",
+    backgroundColor: "#1c2b24",
     minHeight: "100vh",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
     fontFamily: "var(--font-body)",
     padding: "20px",
+    position: "relative",
+    overflow: "hidden",
+  },
+  video: {
+    position: "absolute",
+    inset: 0,
+    width: "100%",
+    height: "100%",
+    objectFit: "cover",
+  },
+  overlay: {
+    position: "absolute",
+    inset: 0,
+    background: "rgba(28, 43, 36, 0.55)",
   },
   card: {
+    position: "relative",
     backgroundColor: "var(--color-card)",
     borderRadius: "20px",
     padding: "40px 32px",
