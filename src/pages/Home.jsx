@@ -24,7 +24,7 @@ function OfferFolder({ onRequest }) {
           <div className="folder-back" />
           <div className="folder-letter">
             <strong>NIVALA50</strong>
-            <p>Flat demo offer + free delivery over ₹499.</p>
+            <p>Flat offer + free delivery over ₹499.</p>
           </div>
           <div className="folder-front"><span>save for later</span></div>
         </div>
@@ -35,7 +35,7 @@ function OfferFolder({ onRequest }) {
           <div className="letter-full" onClick={(e) => e.stopPropagation()}>
             <p className="eyebrow">NIVALA FIRST ORDER</p>
             <h2>NIVALA50</h2>
-            <p>Flat demo offer on your first homemade meal. Free delivery over ₹499. Pickup always free and fresher.</p>
+            <p>Flat offer on your first homemade meal. Free delivery over ₹499. Pickup always free and fresher.</p>
             <p className="muted">Can’t find your craving? Request it — home cooks accept with their price.</p>
             <div className="letter-actions">
               <button className="primary" onClick={onRequest}>Request a dish →</button>
