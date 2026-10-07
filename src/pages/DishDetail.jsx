@@ -3,7 +3,8 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useCart } from "../context/CartContext";
 import { useAuth } from "../context/AuthContext";
 import { fallbackFoodImage, getDishImage, getDishMeta } from "../utils/dishMeta";
-import { getReviews, addReview, getReviewSummary } from "../utils/reviews";
+import { getReviews, addReview } from "../utils/reviews";
+import { api } from "../utils/api";
 
 function DishDetail() {
   const { id } = useParams();
@@ -23,7 +24,17 @@ function DishDetail() {
       .then((data) => {
         setDish(data);
         setLoading(false);
-        setReviews(getReviews(data._id || id));
+        const local = getReviews(data._id || id);
+        setReviews(local.map((r) => ({ ...r, name: r.name, source: "device" })));
+        api.listReviews(data._id || id)
+          .then((remote) => {
+            const mapped = remote.map((r) => ({ id: r._id, name: r.reviewer, rating: r.rating, comment: r.comment, verified: r.verified, source: "cloud" }));
+            setReviews((prev) => {
+              const localOnly = prev.filter((p) => p.source === "device");
+              return [...mapped, ...localOnly];
+            });
+          })
+          .catch(() => {});
       })
       .catch((err) => {
         console.error("Failed to fetch dish:", err);
@@ -31,15 +42,17 @@ function DishDetail() {
       });
   }, [id]);
 
-  const handleAddReview = (e) => {
+  const handleAddReview = async (e) => {
     e.preventDefault();
     if (!commentInput.trim()) return;
-    const r = addReview(dish._id, {
-      name: user?.name || "Guest",
-      rating: ratingInput,
-      comment: commentInput.trim(),
-    });
-    setReviews((prev) => [r, ...prev]);
+    const payload = { name: user?.name || "Guest", rating: ratingInput, comment: commentInput.trim() };
+    try {
+      const saved = await api.createReview({ dishId: dish._id, reviewer: payload.name, rating: payload.rating, comment: payload.comment });
+      setReviews((prev) => [{ id: saved._id, name: saved.reviewer, rating: saved.rating, comment: saved.comment, verified: true, source: "cloud" }, ...prev]);
+    } catch {
+      const r = addReview(dish._id, payload);
+      setReviews((prev) => [{ ...r, source: "device" }, ...prev]);
+    }
     setCommentInput("");
   };
 
@@ -65,7 +78,13 @@ function DishDetail() {
   }
 
   const meta = getDishMeta(dish);
-  const summary = getReviewSummary({ ...dish, reviewCount: meta.reviewCount });
+  const baseCount = meta.reviewCount;
+  const baseRating = dish.rating || 4.5;
+  const extra = reviews.length;
+  const extraSum = reviews.reduce((s, r) => s + (r.rating || 0), 0);
+  const summary = extra === 0
+    ? { count: baseCount, avg: baseRating }
+    : { count: baseCount + extra, avg: ((baseRating * baseCount + extraSum) / (baseCount + extra)).toFixed(1) };
 
   return (
     <div className="app-page detail-page" style={styles.page}>
@@ -122,7 +141,7 @@ function DishDetail() {
           </div>
           <textarea placeholder="Share how it tasted, portion, packing..." value={commentInput} onChange={(e) => setCommentInput(e.target.value)} rows={3} />
           <button type="submit">Post review as {user?.name || "Guest"}</button>
-          <small>Demo reviews save in this browser · Marked as ✓ Verified order</small>
+          <small>Shared reviews save in Nivala cloud · Marked as ✓ Verified order</small>
         </form>
         <div className="review-list">
           {reviews.length === 0 ? <p className="status-message">No written reviews yet — be the first to review this home dish.</p> :
