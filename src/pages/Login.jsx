@@ -8,11 +8,20 @@ function Login() {
   const [role, setRole] = useState(null); // "buyer" or "seller"
   const [name, setName] = useState("");
   const [password, setPassword] = useState("");
+  const [errors, setErrors] = useState({ name: "", password: "" });
 
   const handleLogin = (e) => {
     e.preventDefault();
-    if (!name.trim() || !password.trim()) return;
-    login(name, role);
+    const next = { name: "", password: "" };
+    const cleanName = name.trim();
+    if (!cleanName) next.name = "Enter username (3–20 characters)";
+    else if (cleanName.length < 3 || cleanName.length > 20) next.name = "Enter username (3–20 characters, letters / numbers / _ / .)";
+    else if (!/^[A-Za-z0-9 _.'-]+$/.test(cleanName)) next.name = "Letters, numbers, space, _ . ' - only";
+    if (!password) next.password = "Enter password (min 4 — use letters, numbers & special @ # . ! )";
+    else if (password.length < 4) next.password = "Enter password (min 4 — use letters, numbers & special @ # . ! )";
+    setErrors(next);
+    if (next.name || next.password) return;
+    login(cleanName, role);
     navigate("/");
   };
 
@@ -54,17 +63,19 @@ function Login() {
             <input
               type="text"
               placeholder={role === "buyer" ? "Your name" : "Channel name (e.g. Sunita's Kitchen)"}
-              style={styles.input}
+              style={{ ...styles.input, ...(errors.name ? styles.inputError : {}) }}
               value={name}
-              onChange={(e) => setName(e.target.value)}
+              onChange={(e) => { setName(e.target.value); setErrors((p) => ({ ...p, name: "" })); }}
             />
+            {errors.name ? <p style={styles.errorText}>{errors.name}</p> : null}
             <input
               type="password"
               placeholder="Password"
-              style={styles.input}
+              style={{ ...styles.input, ...(errors.password ? styles.inputError : {}) }}
               value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              onChange={(e) => { setPassword(e.target.value); setErrors((p) => ({ ...p, password: "" })); }}
             />
+            {errors.password ? <p style={styles.errorText}>{errors.password}</p> : null}
             <button type="submit" style={styles.continueButton}>
               Continue
             </button>
@@ -152,6 +163,15 @@ const styles = {
     fontSize: "14px",
     fontFamily: "var(--font-body)",
     outline: "none",
+  },
+  inputError: {
+    border: "2px solid #c0392b",
+  },
+  errorText: {
+    color: "#c0392b",
+    fontSize: "13px",
+    textAlign: "left",
+    margin: "-4px 0 0 2px",
   },
   continueButton: {
     backgroundColor: "var(--color-orange)",
