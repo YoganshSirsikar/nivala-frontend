@@ -10,6 +10,7 @@ function Login() {
   const [role, setRole] = useState(null); // "buyer" or "seller"
   const [name, setName] = useState("");
   const [password, setPassword] = useState("");
+  const [showPw, setShowPw] = useState(false);
   const [errors, setErrors] = useState({ name: "", password: "" });
 
   const handleLogin = (e) => {
@@ -72,13 +73,22 @@ function Login() {
               onChange={(e) => { setName(e.target.value); setErrors((p) => ({ ...p, name: "" })); }}
             />
             {errors.name ? <p style={styles.errorText}>{errors.name}</p> : null}
-            <input
-              type="password"
-              placeholder="Password"
-              style={{ ...styles.input, ...(errors.password ? styles.inputError : {}) }}
-              value={password}
-              onChange={(e) => { setPassword(e.target.value); setErrors((p) => ({ ...p, password: "" })); }}
-            />
+            <div style={styles.pwWrap}>
+              <input
+                type={showPw ? "text" : "password"}
+                placeholder="Password"
+                style={{ ...styles.input, ...styles.pwInput, ...(errors.password ? styles.inputError : {}) }}
+                value={password}
+                onChange={(e) => { setPassword(e.target.value); setErrors((p) => ({ ...p, password: "" })); }}
+              />
+              <button type="button" aria-label={showPw ? "Hide password" : "Show password"} style={styles.eyeButton} onClick={() => setShowPw((v) => !v)}>
+                {showPw ? (
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.7} strokeLinecap="round" strokeLinejoin="round"><path d="M3 3l18 18" /><path d="M10.6 5.1A9.8 9.8 0 0 1 12 5c5 0 9 4.5 10 7-.4 1-1.3 2.4-2.7 3.7M6.6 6.6C4 8.2 2.5 10.6 2 12c1 2.5 5 7 10 7 1.5 0 2.9-.3 4.1-.9" /><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2" /></svg>
+                ) : (
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.7} strokeLinecap="round" strokeLinejoin="round"><path d="M2 12c1-2.5 5-7 10-7s9 4.5 10 7c-1 2.5-5 7-10 7s-9-4.5-10-7z" /><circle cx="12" cy="12" r="3" /></svg>
+                )}
+              </button>
+            </div>
             {errors.password ? <p style={styles.errorText}>{errors.password}</p> : null}
             <button type="submit" style={styles.continueButton}>
               Continue
@@ -186,6 +196,26 @@ const styles = {
   },
   inputError: {
     border: "2px solid #c0392b",
+  },
+  pwWrap: {
+    position: "relative",
+  },
+  pwInput: {
+    width: "100%",
+    boxSizing: "border-box",
+    paddingRight: "44px",
+  },
+  eyeButton: {
+    position: "absolute",
+    right: "8px",
+    top: "50%",
+    transform: "translateY(-50%)",
+    background: "none",
+    border: "none",
+    cursor: "pointer",
+    color: "var(--color-muted)",
+    padding: "6px",
+    display: "flex",
   },
   errorText: {
     color: "#c0392b",
