@@ -49,6 +49,24 @@ function OfferFolder({ onRequest }) {
   );
 }
 
+function GridMeal({ dish, onOpen, onKitchen }) {
+  return (
+    <div onClick={onOpen} style={{ background: "#fff", border: "1px solid #ebe9e2", borderRadius: 17, overflow: "hidden", boxShadow: "0 4px 14px rgba(43,36,32,0.06)", cursor: "pointer", minWidth: 0 }}>
+      <div style={{ position: "relative", height: 140 }}>
+        <img src={getDishImage(dish)} alt={dish.name} onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = fallbackFoodImage; }} style={{ display: "block", width: "100%", height: "100%", objectFit: "cover" }} />
+      </div>
+      <div style={{ padding: 12 }}>
+        <div style={{ color: "#26362e", fontFamily: "Fraunces, Georgia, serif", fontWeight: 700, fontSize: 16, lineHeight: 1.3, margin: "0 0 4px" }}>{dish.name}</div>
+        <div onClick={(e) => { e.stopPropagation(); onKitchen(); }} style={{ color: "#285c45", fontSize: 12, fontWeight: 700, textDecoration: "underline", marginBottom: 8 }}>{dish.channel}</div>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+          <span style={{ color: "#e56437", fontFamily: "Fraunces, Georgia, serif", fontWeight: 700, fontSize: 19 }}>₹{dish.price}</span>
+          <span style={{ color: "#36754d", fontSize: 11, fontWeight: 700 }}>★ {dish.rating}</span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function Home() {
   const navigate = useNavigate();
   const { totalItems } = useCart();
@@ -166,7 +184,7 @@ function Home() {
 
       <section id="discover-dishes" className="home-section discover-section">
         <div className="section-heading"><div><p className="eyebrow">{isFiltered ? "YOUR RESULTS" : "MORE TO DISCOVER"}</p><h2>{selectedCategory ? selectedCategory : searchTerm ? `Results for “${searchTerm}”` : "All homemade meals"}</h2></div>{isFiltered && <button className="clear-filter" onClick={() => { setSearchTerm(""); setSelectedCategory(""); }}>Clear filters ×</button>}</div>
-        {loading ? <p className="status-message">Preparing today’s menu…</p> : filteredDishes.length === 0 ? <p className="status-message">No meals found. Try another search or category.</p> : <div className="dish-grid">{filteredDishes.map((dish) => <div key={dish._id} onClick={() => navigate(`/dish/${dish._id}`)}><FoodCard dish={dish} /></div>)}</div>}
+        {loading ? <p className="status-message">Preparing today’s menu…</p> : filteredDishes.length === 0 ? <p className="status-message">No meals found. Try another search or category.</p> : <div className="dish-grid">{filteredDishes.map((dish) => <GridMeal key={dish._id} dish={dish} onOpen={() => navigate(`/dish/${dish._id}`)} onKitchen={() => navigate(`/channel/${encodeURIComponent(dish.channel)}`)} />)}</div>}
       </section>
 
       <footer className="nivala-footer">
