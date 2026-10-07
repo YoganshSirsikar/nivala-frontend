@@ -41,13 +41,13 @@ function Login() {
             <p style={styles.roleLabel}>Continue as</p>
             <button
               style={styles.roleButton}
-              onClick={() => setRole("buyer")}
+              onClick={() => { setRole("buyer"); setName(""); setPassword(""); setErrors({ name: "", password: "" }); }}
             >
               🍽️ Buyer
             </button>
             <button
               style={{ ...styles.roleButton, ...styles.sellerButton }}
-              onClick={() => setRole("seller")}
+              onClick={() => { setRole("seller"); setName(""); setPassword(""); setErrors({ name: "", password: "" }); }}
             >
               👩‍🍳 Seller
             </button>
@@ -82,7 +82,7 @@ function Login() {
             <button
               type="button"
               style={styles.backLink}
-              onClick={() => setRole(null)}
+              onClick={() => { setRole(null); setName(""); setPassword(""); setErrors({ name: "", password: "" }); }}
             >
               ← Back
             </button>
