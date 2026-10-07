@@ -123,12 +123,13 @@ const styles = {
   },
   card: {
     position: "relative",
-    backgroundColor: "var(--color-card)",
-    borderRadius: "20px",
+    background: "linear-gradient(180deg, #ffffff 0%, #fff9ef 100%)",
+    borderRadius: "24px",
     padding: "40px 32px",
     width: "380px",
     maxWidth: "100%",
-    boxShadow: "0 8px 30px rgba(43, 36, 32, 0.1)",
+    boxShadow: "0 24px 60px rgba(0, 0, 0, 0.35), 0 2px 0 rgba(255, 255, 255, 0.6) inset",
+    border: "1px solid rgba(255, 255, 255, 0.5)",
     textAlign: "center",
   },
   logo: {
