@@ -123,13 +123,13 @@ const styles = {
     margin: "0 0 6px 0",
   },
   logoImage: {
-    width: "76px",
-    height: "76px",
+    width: "110px",
+    height: "84px",
     objectFit: "cover",
-    borderRadius: "50%",
+    objectPosition: "center 42%",
     display: "block",
-    margin: "0 auto 10px",
-    border: "1px solid rgba(43, 36, 32, 0.12)",
+    margin: "0 auto 6px",
+    mixBlendMode: "multiply",
   },
   tagline: {
     color: "var(--color-muted)",
