@@ -85,7 +85,7 @@ function Requests() {
                 <div style={styles.barWrap}><div style={{ ...styles.bar, width: `${(d.count / maxCount) * 100}%` }} /> <small>{d.count} want this</small></div>
               </div>
             ))}
-          <p style={styles.muted}>Example pitch: “35 people nearby want Gujarati Thali.”</p>
+          <p style={styles.muted}>Example: “35 people nearby want Gujarati Thali.”</p>
         </div>
       </section>
 
