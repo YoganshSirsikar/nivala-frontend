@@ -35,7 +35,8 @@ function Login() {
   return (
     <div style={styles.page}>
       <div style={styles.card}>
-        <h1 style={styles.logo}><span style={{ display: "inline-flex", verticalAlign: "middle", marginRight: 6 }}><Icon name="plate" size={24} /></span>Nivala</h1>
+        <img src="/nivala-logo.png" alt="Nivala logo" style={styles.logoImage} />
+        <h1 style={styles.logo}>Nivala</h1>
         <p style={styles.tagline}>Homemade food, from real kitchens</p>
 
         {!role ? (
@@ -120,6 +121,15 @@ const styles = {
     fontWeight: 700,
     fontSize: "26px",
     margin: "0 0 6px 0",
+  },
+  logoImage: {
+    width: "76px",
+    height: "76px",
+    objectFit: "cover",
+    borderRadius: "50%",
+    display: "block",
+    margin: "0 auto 10px",
+    border: "1px solid rgba(43, 36, 32, 0.12)",
   },
   tagline: {
     color: "var(--color-muted)",
