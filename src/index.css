@@ -106,3 +106,7 @@
 .category-card svg { margin-bottom: auto; color: var(--color-green); }
 .trust-strip svg { flex-shrink: 0; }
 .food-card-meta svg, .chef-link svg, .dish-facts svg { vertical-align: middle; }
+
+.meal-title { color: var(--color-text); font-family: var(--font-heading); font-weight: 700; }
+.meal-kitchen { font-family: var(--font-body); }
+@media (max-width: 780px) { .meal-title { font-size: 14px !important; } }
