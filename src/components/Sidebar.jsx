@@ -121,6 +121,7 @@ const styles = {
     height: "42px",
     borderRadius: "50%",
     backgroundColor: "var(--color-green)",
+    color: "#fff",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
