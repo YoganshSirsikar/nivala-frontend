@@ -83,6 +83,15 @@ function Home() {
     document.getElementById("discover-dishes")?.scrollIntoView({ behavior: "smooth", block: "start" });
   };
 
+  const chooseStaple = (term) => {
+    setSelectedCategory("");
+    setSearchTerm(term);
+    setIsSidebarOpen(false);
+    document.getElementById("discover-dishes")?.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
+
+  const staples = ["Tawa Roti", "Dal Tadka", "Pani Puri", "Aloo Tikki", "Rajma Chawal", "Veg Thali"];
+
   return (
     <main className="home-page">
       <header className="home-header">
@@ -118,6 +127,11 @@ function Home() {
         <section className="category-section" aria-labelledby="browse-categories">
           <div className="section-heading"><div><p className="eyebrow">FIND YOUR FAVOURITE</p><h2 id="browse-categories">What are you craving?</h2></div><button onClick={() => setIsSidebarOpen(true)}>View all categories →</button></div>
           <div className="category-pills">{categories.map((category) => <button key={category} className="category-card" onClick={() => chooseCategory(category)}><Icon name={categoryIcons[category] || "plate"} size={28} /><strong>{category}</strong><small>Explore meals →</small></button>)}</div>
+        </section>
+
+        <section className="home-section">
+          <div className="section-heading"><div><p className="eyebrow">GHAR KA KHANA</p><h2>Homemade staples</h2></div><button onClick={() => chooseCategory("Homemade Staples")}>See all staples →</button></div>
+          <div className="category-pills">{staples.map((s) => <button key={s} className="category-card" onClick={() => chooseStaple(s)}><Icon name="plate" size={28} /><strong>{s}</strong><small>From home kitchens →</small></button>)}</div>
         </section>
 
         <section className="trust-strip">
