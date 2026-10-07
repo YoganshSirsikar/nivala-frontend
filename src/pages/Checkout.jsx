@@ -13,7 +13,7 @@ function Checkout() {
   const [placed, setPlaced] = useState(null);
   const [address, setAddress] = useState("");
   const [mode, setMode] = useState("delivery");
-  const [payment, setPayment] = useState("upi");
+  const payment = "cod";
 
   const itemCount = cartItems.reduce((s, i) => s + i.quantity, 0);
   const deliveryFee = mode === "pickup" ? 0 : totalPrice > 499 ? 0 : 29;
@@ -106,12 +106,7 @@ function Checkout() {
 
       <div style={styles.section}>
         <p style={styles.sectionLabel}>2 · Payment</p>
-        <div style={styles.row}>
-          {["upi", "card", "cod"].map((p) => (
-            <button key={p} style={payment === p ? styles.activeChip : styles.chip} onClick={() => setPayment(p)}>{p.toUpperCase()}</button>
-          ))}
-        </div>
-        <p style={styles.hint}>No real money moves. Marked as demo on confirmation.</p>
+        <p style={styles.hint}>Cash on Delivery only — pay when your food arrives.</p>
       </div>
 
       <div style={styles.section}>
