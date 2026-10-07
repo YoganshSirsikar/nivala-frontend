@@ -20,8 +20,10 @@ function Login() {
     if (!cleanName) next.name = "Enter username (3–20 characters)";
     else if (cleanName.length < 3 || cleanName.length > 20) next.name = "Enter username (3–20 characters, letters / numbers / _ / .)";
     else if (!/^[A-Za-z0-9 _.'-]+$/.test(cleanName)) next.name = "Letters, numbers, space, _ . ' - only";
-    if (!password) next.password = "Enter password (min 4 — use letters, numbers & special @ # . ! )";
-    else if (password.length < 4) next.password = "Enter password (min 4 — use letters, numbers & special @ # . ! )";
+    if (!password) next.password = "Enter password (min 6, needs 1 number + 1 special @ # . !)";
+    else if (password.length < 6) next.password = "Password needs min 6 characters";
+    else if (!/[0-9]/.test(password)) next.password = "Password needs at least 1 number";
+    else if (!/[@#.!$%^&*]/.test(password)) next.password = "Password needs at least 1 special character (@ # . !)";
     setErrors(next);
     if (next.name || next.password) return;
     login(cleanName, role);
