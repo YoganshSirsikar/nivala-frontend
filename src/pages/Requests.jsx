@@ -13,13 +13,11 @@ function Requests() {
   const isSeller = user?.role === "seller";
   const [remote, setRemote] = useState([]);
   const [local, setLocal] = useState(loadLocal);
-  const [demand, setDemand] = useState([]);
   const [form, setForm] = useState({ dishName: "", category: "North Indian", locality: "College area", priceOffer: "", notes: "" });
   const [msg, setMsg] = useState("");
 
   const refresh = () => {
     api.listRequests().then(setRemote).catch(() => {});
-    api.demand().then(setDemand).catch(() => {});
   };
   useEffect(refresh, []);
 
@@ -51,7 +49,6 @@ function Requests() {
   };
 
   const all = [...remote, ...local];
-  const maxCount = Math.max(1, ...demand.map((d) => d.count));
 
   return (
     <main className="app-page" style={styles.page}>
@@ -61,7 +58,7 @@ function Requests() {
       </header>
       <p className="eyebrow">CUSTOMER → REQUEST → HOME COOK → ORDER</p>
       <h1 style={styles.title}>Request a Dish</h1>
-      <p style={styles.sub}>Can't find it? Tell home cooks exactly what you crave. Sellers see live demand and accept with their price.</p>
+      <p style={styles.sub}>Can't find it? Tell home cooks exactly what you crave. Sellers can accept with their price.</p>
 
       <section style={styles.grid}>
         <form onSubmit={submit} style={styles.card}>
@@ -76,18 +73,6 @@ function Requests() {
           <button style={styles.primary} type="submit">Post request</button>
           {msg && <small>{msg}</small>}
         </form>
-
-        <div style={styles.card}>
-          <h2>📊 Demand Map — what the area wants</h2>
-          {demand.length === 0 ? <p style={styles.muted}>No live backend demand yet. Post above to seed it — sellers use this to decide what to cook.</p> :
-            demand.slice(0, 8).map((d) => (
-              <div key={`${d.dish}-${d.locality}`} style={styles.demandRow}>
-                <div><strong>{d.dish}</strong><br /><small>{d.locality} · ~₹{d.avgOffer}</small></div>
-                <div style={styles.barWrap}><div style={{ ...styles.bar, width: `${(d.count / maxCount) * 100}%` }} /> <small>{d.count} want this</small></div>
-              </div>
-            ))}
-          <p style={styles.muted}>Example: “35 people nearby want Gujarati Thali.”</p>
-        </div>
       </section>
 
       <section style={styles.card}>
