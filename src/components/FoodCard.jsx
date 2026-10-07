@@ -25,8 +25,8 @@ export default function FoodCard({ dish }) {
         {!meta.isAvailable && <span className="sold-out-badge">Sold out</span>}
       </div>
       <div className="food-card-info">
-        <h3>{dish.name}</h3>
-        <button className="food-card-channel" onClick={handleChannelClick}>
+        <h3 style={{ display: "block", whiteSpace: "normal", overflow: "visible", fontSize: "15px", lineHeight: 1.3, margin: "0 0 4px" }}>{dish.name}</h3>
+        <button className="food-card-channel" style={{ display: "block", whiteSpace: "normal", overflow: "visible", marginBottom: 6 }} onClick={handleChannelClick}>
           {dish.channel}
         </button>
         <div className="food-card-meta"><span style={{ display: "inline-flex", alignItems: "center", gap: 4 }}><Icon name="clock" size={12} /> {meta.prepTime}</span><span>★ {dish.rating} ({meta.reviewCount})</span></div>
