@@ -132,6 +132,20 @@ function Profile() {
     .reduce((s, o) => s + (o.total || 0), 0);
   const commission = Math.round(earnings * 0.1);
 
+  const liveOrders = remoteOrders.map((o) => ({ ...o, live: deriveLiveStatus(o), left: minutesLeft(o) }));
+  const activeCount = liveOrders.filter((o) => o.live !== "Completed" && o.live !== "Cancelled").length;
+
+  const statusStyle = (s) => {
+    switch (s) {
+      case "Placed": return { bg: "#fef3e2", fg: "#9a5b00", dot: "#f4b942" };
+      case "Accepted": return { bg: "#e8f0fe", fg: "#1a56db", dot: "#3b82f6" };
+      case "Preparing": return { bg: "#fff0e5", fg: "#c2410c", dot: "#e56437" };
+      case "Ready": return { bg: "#e6f6ec", fg: "#1c7a3d", dot: "#22c55e" };
+      case "Completed": return { bg: "#dcefe3", fg: "#14532d", dot: "#14532d" };
+      default: return { bg: "#f3f0ea", fg: "#69746c", dot: "#a8a29e" };
+    }
+  };
+
   return (
     <main className="app-page" style={styles.page}>
       <header style={styles.header}>
@@ -148,7 +162,7 @@ function Profile() {
       {isSeller ? (
         <>
           <section style={styles.section}>
-            <h2>1 · My kitchen ({kitchenName})</h2>
+            <h2><span style={styles.stepBadge}>1</span> My kitchen <small style={styles.sectionSmall}>{kitchenName}</small></h2>
             <form onSubmit={handleSaveKitchen} style={styles.form}>
               <input style={styles.input} placeholder="Location" value={kitchenForm.location} onChange={(e) => setKitchenForm({ ...kitchenForm, location: e.target.value })} />
               <textarea style={styles.input} placeholder="Kitchen story — who cooks, tradition..." value={kitchenForm.story} onChange={(e) => setKitchenForm({ ...kitchenForm, story: e.target.value })} />
@@ -159,7 +173,7 @@ function Profile() {
           </section>
 
           <section style={styles.section}>
-            <h2>2 · Add dish — goes live instantly</h2>
+            <h2><span style={styles.stepBadge}>2</span> Menu <small style={styles.sectionSmall}>{myDishes.length} live dishes</small></h2>
             <form onSubmit={handleAddDish} style={styles.form}>
               <div style={styles.grid}>
                 <input style={styles.input} placeholder="Dish name *" value={dishForm.name} onChange={(e) => setDishForm({ ...dishForm, name: e.target.value })} />
@@ -176,31 +190,44 @@ function Profile() {
             </form>
             <h3 style={{ marginTop: 16 }}>My dishes ({myDishes.length})</h3>
             {myDishes.map((d) => (
-              <div key={d._id} style={styles.orderCard}>
-                <strong>{d.name}</strong> · ₹{d.price} · {d.isAvailable ? "Available" : "Sold out"}{" "}
-                <button style={styles.link} onClick={() => toggleAvailability(d)}>toggle availability</button>
+              <div key={d._id} style={styles.dishRow}>
+                <div><strong>{d.name}</strong> · ₹{d.price}<br /><small>{d.category} · {d.prepTime}</small></div>
+                <span style={d.isAvailable ? styles.availOn : styles.availOff}>{d.isAvailable ? "● Live" : "● Paused"}</span>
+                <button style={styles.link} onClick={() => toggleAvailability(d)}>{d.isAvailable ? "Pause" : "Resume"}</button>
               </div>
             ))}
           </section>
 
           <section style={styles.section}>
-            <h2>3 · Incoming orders ({remoteOrders.length} real + {localOrders.length} local demo)</h2>
+            <h2><span style={styles.stepBadge}>3</span> Live orders {activeCount > 0 ? <span className="pulse-dot" /> : null} <small style={styles.sectionSmall}>{activeCount} cooking now · {remoteOrders.length} total</small></h2>
             {remoteOrders.length === 0 && <p>No real backend orders yet — place a test order as buyer.</p>}
-            {remoteOrders.map((o) => (
-              <div key={o._id} style={styles.orderCard}>
-                <strong>{o._id.slice(-6)}</strong> · {o.buyer} · ₹{o.total} · <b>{deriveLiveStatus(o)}</b> · {o.mode} · {minutesLeft(o) > 0 ? `${minutesLeft(o)} min left` : "time over — auto-completed"}
-                <br /><small>{o.items.map((i) => `${i.name} x${i.qty}`).join(", ")}</small>
-                <br />
-                {STATUS_FLOW.filter((s) => s !== "Placed").map((s) => (
-                  <button key={s} style={styles.mini} disabled={deriveLiveStatus(o) === s} onClick={() => advanceStatus(o, s)}>{s}</button>
-                ))}
-              </div>
-            ))}
+            {liveOrders.map((o) => {
+              const st = statusStyle(o.live);
+              const next = STATUS_FLOW[STATUS_FLOW.indexOf(o.live) + 1];
+              return (
+                <div key={o._id} style={{ ...styles.liveCard, borderLeft: `5px solid ${st.dot}` }}>
+                  <div style={styles.liveTop}>
+                    <div><strong>#{o._id.slice(-6)}</strong> · {o.buyer} · <strong>₹{o.total}</strong></div>
+                    <span style={{ ...styles.statusPill, background: st.bg, color: st.fg }}>{o.live === "Placed" ? <span className="pulse-dot" /> : null}{o.live}</span>
+                  </div>
+                  <div style={styles.liveMeta}>{o.mode} · {o.left > 0 ? `${o.left} min left` : "time over — auto-completed"} · {o.items.map((i) => `${i.name} x${i.qty}`).join(", ")}</div>
+                  <div style={styles.liveActions}>
+                    {next && next !== "Placed" && (
+                      <button style={styles.nextButton} onClick={() => advanceStatus(o, next)}>Mark {next} →</button>
+                    )}
+                    {STATUS_FLOW.filter((s) => s !== "Placed" && s !== next).map((s) => (
+                      <button key={s} style={styles.mini} disabled={o.live === s} onClick={() => advanceStatus(o, s)}>{s}</button>
+                    ))}
+                  </div>
+                </div>
+              );
+            })}
           </section>
 
-          <section style={styles.section}>
-            <h2>4 · Earnings (demo)</h2>
-            <p>Completed sales: ₹{earnings} · Commission 10%: ₹{commission} · You keep: ₹{earnings - commission}</p>
+          <section style={styles.earnCard}>
+            <p style={styles.earnEyebrow}>EARNINGS</p>
+            <h2 style={styles.earnTotal}>₹{earnings - commission} <small>yours</small></h2>
+            <p style={styles.earnSub}>₹{earnings} sales · ₹{commission} Nivala commission (10%) · COD collected by you</p>
           </section>
         </>
       ) : (
@@ -262,7 +289,22 @@ const styles = {
   primary: { background: "var(--color-green)", color: "#fff", border: "none", padding: "12px 18px", borderRadius: "10px", cursor: "pointer", fontWeight: 600, width: "100%", maxWidth: "320px" },
   orderCard: { borderBottom: "1px solid rgba(43,36,32,0.08)", padding: "10px 0", fontSize: "14px", wordBreak: "break-word" },
   link: { background: "none", border: "none", color: "var(--color-green)", cursor: "pointer", fontSize: "13px", textDecoration: "underline" },
-  mini: { margin: "4px 4px 0 0", padding: "6px 10px", borderRadius: "8px", border: "1px solid rgba(43,36,32,0.2)", cursor: "pointer", fontSize: "12px" },
+  mini: { margin: "4px 4px 0 0", padding: "6px 10px", borderRadius: "8px", border: "1px solid rgba(43,36,32,0.2)", cursor: "pointer", fontSize: "12px", background: "#fff" },
+  nextButton: { margin: "8px 8px 0 0", padding: "10px 18px", borderRadius: "999px", border: "none", background: "var(--color-green)", color: "#fff", fontWeight: 700, cursor: "pointer", fontSize: "13px" },
+  liveCard: { background: "#fffdf8", border: "1px solid #eee3d3", borderRadius: "14px", padding: "14px", margin: "10px 0", boxShadow: "0 4px 14px rgba(43,36,32,0.06)" },
+  liveTop: { display: "flex", justifyContent: "space-between", alignItems: "center", gap: "10px", flexWrap: "wrap" },
+  liveMeta: { fontSize: "13px", color: "var(--color-muted)", marginTop: "6px" },
+  liveActions: { marginTop: "6px" },
+  statusPill: { display: "inline-flex", alignItems: "center", gap: "6px", fontSize: "12px", fontWeight: 800, padding: "6px 12px", borderRadius: "999px", textTransform: "uppercase", letterSpacing: "0.4px" },
+  stepBadge: { display: "inline-grid", placeItems: "center", width: "26px", height: "26px", borderRadius: "50%", background: "var(--color-green)", color: "#fff", fontSize: "14px", marginRight: "8px", verticalAlign: "middle" },
+  sectionSmall: { fontSize: "13px", color: "var(--color-muted)", fontWeight: 400, fontFamily: "var(--font-body)" },
+  dishRow: { display: "flex", alignItems: "center", gap: "10px", padding: "10px 0", borderBottom: "1px solid rgba(43,36,32,0.08)", fontSize: "14px", flexWrap: "wrap" },
+  availOn: { fontSize: "12px", fontWeight: 800, color: "#1c7a3d", background: "#e6f6ec", padding: "4px 10px", borderRadius: "999px" },
+  availOff: { fontSize: "12px", fontWeight: 800, color: "#b3261e", background: "#fdecea", padding: "4px 10px", borderRadius: "999px" },
+  earnCard: { background: "linear-gradient(135deg, #285c45 0%, #3d8a5f 60%, #e56437 130%)", color: "#fff", borderRadius: "18px", padding: "22px", margin: "16px 0", maxWidth: "700px", boxShadow: "0 12px 28px rgba(40,92,69,0.25)" },
+  earnEyebrow: { fontSize: "11px", letterSpacing: "0.2em", opacity: 0.8, margin: 0 },
+  earnTotal: { fontFamily: "var(--font-heading)", fontSize: "38px", margin: "6px 0" },
+  earnSub: { fontSize: "13px", opacity: 0.9, margin: 0 },
   timeline: { display: "flex", gap: "6px", flexWrap: "wrap", margin: "8px 0" },
   dot: { fontSize: "11px", padding: "4px 8px", borderRadius: "99px", background: "#f0ece6", color: "#69746c" },
   dotOn: { fontSize: "11px", padding: "4px 8px", borderRadius: "99px", background: "#e6f3ea", color: "#2f6e4f", fontWeight: 700 },
