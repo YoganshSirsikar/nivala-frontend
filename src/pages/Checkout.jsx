@@ -74,7 +74,7 @@ function Checkout() {
           <h2 style={styles.confirmTitle}>Order {placed.id} placed!</h2>
           <p style={styles.confirmText}>
             {placed.mode === "pickup" ? "Pickup" : "Delivery"} in ~{placed.etaMinutes} min · Homemade food is being prepared fresh.
-            This is a demo order — no real payment was made ({placed.payment}).
+            Pay in cash on {placed.mode === "pickup" ? "pickup" : "delivery"}.
           </p>
           <p style={styles.confirmText}>Track it in Sidebar → Your Profile → Order history.</p>
           <button style={styles.primaryButton} onClick={() => navigate("/profile")}>View my orders</button>{" "}
